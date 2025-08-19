@@ -1,0 +1,21 @@
+{
+  "robots": [
+    "Wackel-Bot 3000",
+    "Chaos-Maschine",
+    "Sturz-Roboter",
+    "Mega-Wackler",
+    "Schrott-König",
+    "Bumm-Bot",
+    "Zitter-Zerstörer",
+    "Krach-Kiste",
+    "Wums-Wurm",
+    "Kipp-Bot",
+    "Vibro-Fighter"
+  ],
+  "current_match": {
+    "robot1": "Wackel-Bot 3000",
+    "robot2": "Schrott-König",
+    "round": "Halbfinale"
+  },
+  "last_updated": "2025-08-19T23:04:14.736388"
+}

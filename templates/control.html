@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hebocon Tournament Control</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .urls {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .urls a {
+            color: #ff6b35;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 15px;
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .control-panel h2 {
+            color: #ff6b35;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .current-match {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .match-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .robot-name-display {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 8px;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .slot-selection {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .slot-button {
+            background: #34495e;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .slot-button:hover {
+            background: #2c3e50;
+            transform: translateY(-2px);
+        }
+
+        .slot-button.selected {
+            background: #ff6b35;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+        }
+
+        .robot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .robot-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .robot-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .robot-button .delete-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .robot-button:hover .delete-btn {
+            display: block;
+        }
+
+        .quick-add {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 2px dashed #dee2e6;
+        }
+
+        .quick-add input {
+            background: white;
+            border: 2px solid #dee2e6;
+            color: #333;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 5px;
+            font-size: 14px;
+            width: 250px;
+        }
+
+        .quick-add button, .action-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .quick-add button:hover, .action-button:hover {
+            background: #218838;
+        }
+
+        .danger {
+            background: #dc3545 !important;
+        }
+
+        .danger:hover {
+            background: #c82333 !important;
+        }
+
+        .round-controls {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .round-button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .round-button:hover {
+            background: #5a6268;
+        }
+
+        .round-button.active {
+            background: #ff6b35;
+        }
+
+        .status-bar {
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        .status-bar.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .status-bar.error {
+            background: #dc3545;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 HEBOCON TOURNAMENT</h1>
+        <p>Live Control Panel</p>
+    </div>
+
+    <div class="urls">
+        <strong>URLs:</strong>
+        <a href="/" target="_blank">Control Panel</a> |
+        <a href="/overlay" target="_blank">OBS Overlay</a> |
+        <a href="/api/data" target="_blank">API Daten</a>
+    </div>
+
+    <!-- Aktuelle Anzeige -->
+    <div class="control-panel">
+        <h2>📺 Aktuelle Anzeige</h2>
+        <div class="current-match">
+            <h3 id="currentRound">Viertelfinale</h3>
+            <div class="match-display">
+                <div class="robot-name-display" id="currentRobot1">Wackel-Bot 3000</div>
+                <div style="font-size: 1.8em;">⚡ VS ⚡</div>
+                <div class="robot-name-display" id="currentRobot2">Chaos-Maschine</div>
+            </div>
+        </div>
+        
+        <div class="status-bar" id="statusDisplay">
+            ✅ Bereit - System läuft
+        </div>
+    </div>
+
+    <!-- Slot Auswahl -->
+    <div class="control-panel">
+        <h2>🎯 Roboter Position</h2>
+        <div class="slot-selection">
+            <button class="slot-button" id="slot1Button" onclick="selectSlot(1)">
+                🤖 Roboter 1 auswählen
+            </button>
+            <button class="slot-button" id="slot2Button" onclick="selectSlot(2)">
+                🤖 Roboter 2 auswählen
+            </button>
+        </div>
+    </div>
+
+    <!-- Roboter Auswahl -->
+    <div class="control-panel">
+        <h2>🤖 Roboter Bibliothek</h2>
+        <div class="robot-grid" id="robotGrid">
+            <!-- Roboter werden hier eingefügt -->
+        </div>
+
+        <div class="quick-add">
+            <h4 style="margin-bottom: 10px; color: #333;">Neuen Roboter hinzufügen:</h4>
+            <input type="text" id="newRobotInput" placeholder="Roboter Name" maxlength="30">
+            <button onclick="addRobot()">➕ Hinzufügen</button>
+        </div>
+    </div>
+
+    <!-- Turnier Steuerung -->
+    <div class="control-panel">
+        <h2>🏆 Turnier Runde</h2>
+        <div class="round-controls">
+            <button class="round-button" onclick="setRound('Vorrunde')">Vorrunde</button>
+            <button class="round-button active" onclick="setRound('Viertelfinale')">Viertelfinale</button>
+            <button class="round-button" onclick="setRound('Halbfinale')">Halbfinale</button>
+            <button class="round-button" onclick="setRound('Finale')">Finale</button>
+            <button class="round-button" onclick="setRound('Spiel um Platz 3')">Platz 3</button>
+        </div>
+        
+        <div class="quick-add">
+            <input type="text" id="customRoundInput" placeholder="Eigene Runde eingeben">
+            <button onclick="setCustomRound()">Setzen</button>
+        </div>
+    </div>
+
+    <!-- Aktionen -->
+    <div class="control-panel">
+        <h2>⚙️ Aktionen</h2>
+        <div class="actions">
+            <button class="action-button" onclick="refreshData()">🔄 Daten neu laden</button>
+            <button class="action-button danger" onclick="resetAll()">💥 Alles zurücksetzen</button>
+            <button class="action-button" onclick="openOverlay()">🖥️ Overlay öffnen</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedSlot = null;
+        let currentData = {};
+
+        // API Aufrufe
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+                
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(endpoint, options);
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                updateStatus('❌ Verbindungsfehler', 'error');
+                return null;
+            }
+        }
+
+        // Daten laden
+        async function loadData() {
+            const data = await apiCall('/api/data');
+            if (data) {
+                currentData = data;
+                updateDisplay();
+                renderRobots();
+                updateStatus('✅ Daten geladen', 'success');
+            }
+        }
+
+        // Display aktualisieren
+        function updateDisplay() {
+            document.getElementById('currentRobot1').textContent = currentData.current_match?.robot1 || 'Roboter 1';
+            document.getElementById('currentRobot2').textContent = currentData.current_match?.robot2 || 'Roboter 2';
+            document.getElementById('currentRound').textContent = currentData.current_match?.round || 'Runde';
+        }
+
+        // Roboter Grid rendern
+        function renderRobots() {
+            const grid = document.getElementById('robotGrid');
+            grid.innerHTML = '';
+            
+            if (currentData.robots) {
+                currentData.robots.forEach(robot => {
+                    const button = document.createElement('button');
+                    button.className = 'robot-button';
+                    button.textContent = robot;
+                    button.onclick = () => selectRobot(robot);
+                    
+                    // Delete button
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.textContent = '×';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteRobot(robot);
+                    };
+                    
+                    button.appendChild(deleteBtn);
+                    grid.appendChild(button);
+                });
+            }
+            
+            updateStatus(`📚 ${currentData.robots?.length || 0} Roboter verfügbar`, 'success');
+        }
+
+        // Slot auswählen
+        function selectSlot(slotNumber) {
+            selectedSlot = slotNumber;
+            
+            document.querySelectorAll('.slot-button').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById(`slot${slotNumber}Button`).classList.add('selected');
+            
+            updateStatus(`🎯 Slot ${slotNumber} ausgewählt - Roboter anklicken!`, 'warning');
+        }
+
+        // Roboter auswählen
+        async function selectRobot(robotName) {
+            if (!selectedSlot) {
+                updateStatus('⚠️ Bitte erst einen Slot auswählen!', 'error');
+                return;
+            }
+
+            const matchData = {};
+            matchData[`robot${selectedSlot}`] = robotName;
+            
+            const result = await apiCall('/api/match', 'POST', matchData);
+            if (result && result.success) {
+                await loadData();
+                updateStatus(`✅ ${robotName} → Slot ${selectedSlot}`, 'success');
+                
+                // Slot deselektieren
+                selectedSlot = null;
+                document.querySelectorAll('.slot-button').forEach(btn => btn.classList.remove('selected'));
+            }
+        }
+
+        // Roboter hinzufügen
+        async function addRobot() {
+            const name = document.getElementById('newRobotInput').value.trim();
+            if (!name) {
+                updateStatus('⚠️ Bitte einen Namen eingeben!', 'error');
+                return;
+            }
+
+            const result = await apiCall('/api/robots', 'POST', { name: name });
+            if (result && result.success) {
+                document.getElementById('newRobotInput').value = '';
+                await loadData();
+                updateStatus(`✅ ${name} hinzugefügt`, 'success');
+            } else {
+                updateStatus(`❌ ${result?.message || 'Fehler beim Hinzufügen'}`, 'error');
+            }
+        }
+
+        // Roboter löschen
+        async function deleteRobot(robotName) {
+            if (confirm(`Roboter "${robotName}" wirklich löschen?`)) {
+                const result = await apiCall(`/api/robots/${encodeURIComponent(robotName)}`, 'DELETE');
+                if (result && result.success) {
+                    await loadData();
+                    updateStatus(`🗑️ ${robotName} gelöscht`, 'success');
+                }
+            }
+        }
+
+        // Runde setzen
+        async function setRound(roundName) {
+            const result = await apiCall('/api/match', 'POST', { round: roundName });
+            if (result && result.success) {
+                await loadData();
+                
+                // UI Update
+                document.querySelectorAll('.round-button').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+                
+                updateStatus(`🏆 Runde: ${roundName}`, 'success');
+            }
+        }
+
+        // Eigene Runde
+        async function setCustomRound() {
+            const roundName = document.getElementById('customRoundInput').value.trim();
+            if (roundName) {
+                await setRound(roundName);
+                document.getElementById('customRoundInput').value = '';
+            }
+        }
+
+        // Status aktualisieren
+        function updateStatus(message, type = 'success') {
+            const statusEl = document.getElementById('statusDisplay');
+            statusEl.textContent = message;
+            statusEl.className = `status-bar ${type}`;
+        }
+
+        // Daten neu laden
+        async function refreshData() {
+            await loadData();
+        }
+
+        // Alles zurücksetzen
+        async function resetAll() {
+            if (confirm('🚨 ALLE Daten zurücksetzen?')) {
+                const result = await apiCall('/api/reset', 'POST');
+                if (result && result.success) {
+                    await loadData();
+                    updateStatus('🔄 Daten zurückgesetzt', 'success');
+                }
+            }
+        }
+
+        // Overlay öffnen
+        function openOverlay() {
+            window.open('/overlay', '_blank');
+        }
+
+        // Tastatur Shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.key === '1') selectSlot(1);
+            if (event.key === '2') selectSlot(2);
+            if (event.key === 'F5') {
+                event.preventDefault();
+                refreshData();
+            }
+        });
+
+        // Enter in Input Feldern
+        document.getElementById('newRobotInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') addRobot();
+        });
+
+        document.getElementById('customRoundInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') setCustomRound();
+        });
+
+        // Auto-refresh alle 5 Sekunden
+        setInterval(loadData, 5000);
+
+        // Initial laden
+        loadData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hebocon Overlay</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            font-family: 'Arial Black', Arial, sans-serif;
+            overflow: hidden;
+            width: 1920px;
+            height: 1080px;
+        }
+
+        .overlay-container {
+            position: relative;
+            width: 1920px;
+            height: 1080px;
+        }
+
+        /* Tournament Info Oben */
+        .tournament-header {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(30, 30, 30, 0.9) 100%);
+            padding: 20px 40px;
+            border-radius: 15px;
+            border: 3px solid #ff6b35;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .tournament-title {
+            font-size: 36px;
+            color: #ff6b35;
+            font-weight: bold;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            letter-spacing: 2px;
+        }
+
+        .round-display {
+            font-size: 20px;
+            color: #ffffff;
+            margin: 8px 0 0 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            font-weight: bold;
+        }
+
+        /* Robot Battle Display Unten */
+        .robot-battle {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(20, 20, 20, 0.9) 100%);
+            padding: 25px 50px;
+            border-radius: 20px;
+            border: 4px solid #ff6b35;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .robot-name {
+            font-size: 42px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+            min-width: 280px;
+            text-align: center;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .robot-name::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        }
+
+        .vs {
+            font-size: 56px;
+            font-weight: bold;
+            color: #ff6b35;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+            animation: pulse 2.5s infinite;
+            position: relative;
+        }
+
+        .vs::before {
+            content: '⚡';
+            position: absolute;
+            left: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: spark 1.5s infinite;
+        }
+
+        .vs::after {
+            content: '⚡';
+            position: absolute;
+            right: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: spark 1.5s infinite 0.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+            }
+            50% { 
+                transform: scale(1.1);
+                text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8), 0 0 20px #ff6b35;
+            }
+        }
+
+        @keyframes spark {
+            0%, 100% { opacity: 0.3; transform: translateY(-50%) scale(0.8); }
+            50% { opacity: 1; transform: translateY(-50%) scale(1.2); }
+        }
+
+        /* Corner Decorations */
+        .corner-decoration {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #ff6b35, transparent);
+            opacity: 0.1;
+        }
+
+        .corner-decoration.top-left {
+            top: 0;
+            left: 0;
+            border-radius: 0 0 100px 0;
+        }
+
+        .corner-decoration.top-right {
+            top: 0;
+            right: 0;
+            border-radius: 0 0 0 100px;
+        }
+
+        .corner-decoration.bottom-left {
+            bottom: 0;
+            left: 0;
+            border-radius: 0 100px 0 0;
+        }
+
+        .corner-decoration.bottom-right {
+            bottom: 0;
+            right: 0;
+            border-radius: 100px 0 0 0;
+        }
+
+        /* Status Indicator */
+        .status-indicator {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: monospace;
+            border: 1px solid #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .status-indicator::before {
+            content: '●';
+            margin-right: 8px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: absolute;
+            bottom: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            display: none;
+        }
+
+        .loading.visible {
+            display: block;
+        }
+
+        /* Error State */
+        .error-state {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 18px;
+            display: none;
+        }
+
+        .error-state.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay-container">
+        <!-- Corner Decorations -->
+        <div class="corner-decoration top-left"></div>
+        <div class="corner-decoration top-right"></div>
+        <div class="corner-decoration bottom-left"></div>
+        <div class="corner-decoration bottom-right"></div>
+
+        <!-- Status Indicator -->
+        <div class="status-indicator" id="statusIndicator">
+            LIVE
+        </div>
+
+        <!-- Tournament Header -->
+        <div class="tournament-header">
+            <h1 class="tournament-title">HEBOCON 2025</h1>
+            <p class="round-display" id="roundDisplay">Viertelfinale</p>
+        </div>
+
+        <!-- Robot Battle Display -->
+        <div class="robot-battle">
+            <div class="robot-name" id="robot1">Wackel-Bot 3000</div>
+            <div class="vs">VS</div>
+            <div class="robot-name" id="robot2">Chaos-Maschine</div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loadingIndicator">
+            🔄 Lade Tournament-Daten...
+        </div>
+
+        <!-- Error State -->
+        <div class="error-state" id="errorState">
+            ❌ Keine Verbindung zum Server
+        </div>
+    </div>
+
+    <script>
+        let lastUpdateTime = null;
+
+        // Daten vom Server laden
+        async function loadData() {
+            try {
+                document.getElementById('loadingIndicator').classList.add('visible');
+                document.getElementById('errorState').classList.remove('visible');
+                
+                const response = await fetch('/api/data');
+                const data = await response.json();
+                
+                if (data && data.current_match) {
+                    // Roboternamen aktualisieren
+                    document.getElementById('robot1').textContent = data.current_match.robot1 || 'Roboter 1';
+                    document.getElementById('robot2').textContent = data.current_match.robot2 || 'Roboter 2';
+                    document.getElementById('roundDisplay').textContent = data.current_match.round || 'Turnier';
+                    
+                    // Update Zeit merken
+                    lastUpdateTime = new Date();
+                    updateStatusIndicator('LIVE');
+                }
+                
+                document.getElementById('loadingIndicator').classList.remove('visible');
+                
+            } catch (error) {
+                console.error('Fehler beim Laden der Daten:', error);
+                document.getElementById('loadingIndicator').classList.remove('visible');
+                document.getElementById('errorState').classList.add('visible');
+                updateStatusIndicator('OFFLINE');
+            }
+        }
+
+        // Status Indicator aktualisieren
+        function updateStatusIndicator(status) {
+            const indicator = document.getElementById('statusIndicator');
+            indicator.textContent = status;
+            
+            if (status === 'LIVE') {
+                indicator.style.color = '#00ff00';
+                indicator.style.borderColor = '#00ff00';
+                indicator.style.boxShadow = '0 0 10px rgba(0, 255, 0, 0.3)';
+            } else {
+                indicator.style.color = '#ff0000';
+                indicator.style.borderColor = '#ff0000';
+                indicator.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.3)';
+            }
+        }
+
+        // Automatisches Update alle 2 Sekunden
+        function startAutoUpdate() {
+            setInterval(loadData, 2000);
+        }
+
+        // Connection Status prüfen
+        function checkConnection() {
+            if (lastUpdateTime) {
+                const now = new Date();
+                const timeDiff = (now - lastUpdateTime) / 1000;
+                
+                if (timeDiff > 10) {
+                    updateStatusIndicator('TIMEOUT');
+                }
+            }
+        }
+
+        // Connection Check alle 5 Sekunden
+        setInterval(checkConnection, 5000);
+
+        // Tastatur Shortcuts für Debugging
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'r' || event.key === 'R') {
+                loadData();
+            }
+            if (event.key === 'i' || event.key === 'I') {
+                console.log('Overlay Info:', {
+                    lastUpdate: lastUpdateTime,
+                    currentRobot1: document.getElementById('robot1').textContent,
+                    currentRobot2: document.getElementById('robot2').textContent,
+                    currentRound: document.getElementById('roundDisplay').textContent
+                });
+            }
+        });
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🤖 Hebocon Overlay gestartet');
+            loadData();
+            startAutoUpdate();
+        });
+
+        // Page Visibility API - pausiert Updates wenn Tab nicht aktiv
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                loadData(); // Sofort laden wenn Tab wieder aktiv wird
+            }
+        });
+    </script>
+</body>
+</html>

@@ -263,6 +263,158 @@
             margin: 15px 0;
             flex-wrap: wrap;
         }
+
+        /* Bracket Styles */
+        .bracket-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .bracket-round {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+        }
+
+        .bracket-round h4 {
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .bracket-match {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .bracket-match:hover {
+            border-color: #ff6b35;
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+        }
+
+        .bracket-match.current {
+            border-color: #ff6b35;
+            background: #fff5f2;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.3);
+        }
+
+        .bracket-match.completed {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .bracket-match-header {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .bracket-robots {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .bracket-robot {
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-size: 13px;
+            border: 1px solid #dee2e6;
+        }
+
+        .bracket-robot.clickable {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .bracket-robot.clickable:hover {
+            background: #e9ecef;
+            border-color: #ff6b35;
+        }
+
+        .bracket-robot.winner {
+            background: #d4edda;
+            border-color: #28a745;
+            font-weight: bold;
+        }
+
+        .bracket-setup {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .bracket-position {
+            background: white;
+            border: 2px dashed #dee2e6;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .bracket-position.filled {
+            border-style: solid;
+            border-color: #28a745;
+            background: #f8fff9;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .bracket-position:hover {
+            border-color: #ff6b35;
+            background: #fff5f2;
+        }
+
+        .bracket-status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .bracket-status.not-setup {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+
+        .bracket-status.setup {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .bracket-status.running {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .bracket-status.completed {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -339,19 +491,70 @@
         </div>
     </div>
 
+    <!-- Tournament Bracket -->
+    <div class="control-panel">
+        <h2>🏆 Tournament Bracket</h2>
+        
+        <!-- Bracket Status -->
+        <div class="bracket-status not-setup" id="bracketStatus">
+            ⚠️ Tournament bracket not set up
+        </div>
+        
+        <!-- Bracket Setup -->
+        <div id="bracketSetupSection">
+            <h3 style="margin-bottom: 15px;">Bracket Setup (16 Robots)</h3>
+            <div class="bracket-setup" id="bracketSetup">
+                <!-- Bracket positions will be populated here -->
+            </div>
+            <div style="margin: 15px 0;">
+                <button class="action-button" onclick="setupBracket()">🎯 Create Bracket</button>
+                <button class="action-button" onclick="randomAssignRobots()">🎲 Random Assignment</button>
+                <button class="action-button" onclick="finishBracketSetup()" id="finishBracketBtn" style="display: none;">✅ Start Tournament</button>
+                <button class="action-button danger" onclick="resetBracket()">🔄 Reset Bracket</button>
+            </div>
+        </div>
+        
+        <!-- Bracket Display -->
+        <div id="bracketDisplaySection" style="display: none;">
+            <div class="bracket-container" id="bracketContainer">
+                <!-- Tournament bracket will be displayed here -->
+            </div>
+            
+            <div style="margin: 15px 0;">
+                <button class="action-button" onclick="getNextMatch()">▶️ Next Match</button>
+                <button class="action-button" onclick="editBracketSetup()">⚙️ Edit Setup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay Control -->
+    <div class="control-panel">
+        <h2>📺 OBS Overlay Control</h2>
+        <div class="current-match" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+            <h3 id="overlayModeDisplay">Current Mode: Match Display</h3>
+            <p style="margin: 10px 0 0 0; font-size: 0.9em; opacity: 0.9;">Control what viewers see in OBS</p>
+        </div>
+        <div class="actions">
+            <button class="action-button" onclick="setOverlayMode('match')" id="showMatchBtn">🥊 Show Match</button>
+            <button class="action-button" onclick="setOverlayMode('bracket')" id="showBracketBtn">🏆 Show Bracket</button>
+            <button class="action-button" onclick="openOverlay()">🖥️ Open Overlay</button>
+        </div>
+    </div>
+
     <!-- Aktionen -->
     <div class="control-panel">
         <h2>⚙️ Aktionen</h2>
         <div class="actions">
             <button class="action-button" onclick="refreshData()">🔄 Daten neu laden</button>
             <button class="action-button danger" onclick="resetAll()">💥 Alles zurücksetzen</button>
-            <button class="action-button" onclick="openOverlay()">🖥️ Overlay öffnen</button>
         </div>
     </div>
 
     <script>
         let selectedSlot = null;
         let currentData = {};
+        let currentBracket = {};
+        let selectedBracketPosition = null;
 
         // API Aufrufe
         async function apiCall(endpoint, method = 'GET', data = null) {
@@ -383,7 +586,414 @@
                 currentData = data;
                 updateDisplay();
                 renderRobots();
+                await loadBracket();
+                await loadOverlayMode();
                 updateStatus('✅ Daten geladen', 'success');
+            }
+        }
+
+        // Overlay control functions
+        async function loadOverlayMode() {
+            const result = await apiCall('/api/overlay/mode');
+            if (result) {
+                updateOverlayModeDisplay(result.mode);
+            }
+        }
+
+        async function setOverlayMode(mode) {
+            const result = await apiCall('/api/overlay/mode', 'POST', { mode: mode });
+            if (result && result.success) {
+                updateOverlayModeDisplay(mode);
+                const modeText = mode === 'match' ? 'Match Display' : 'Bracket Display';
+                updateStatus(`📺 OBS Overlay switched to: ${modeText}`, 'success');
+            } else {
+                updateStatus('❌ Failed to change overlay mode', 'error');
+            }
+        }
+
+        function updateOverlayModeDisplay(mode) {
+            const display = document.getElementById('overlayModeDisplay');
+            const matchBtn = document.getElementById('showMatchBtn');
+            const bracketBtn = document.getElementById('showBracketBtn');
+            
+            if (mode === 'match') {
+                display.textContent = 'Current Mode: Match Display';
+                matchBtn.style.background = '#28a745';
+                bracketBtn.style.background = '#6c757d';
+            } else {
+                display.textContent = 'Current Mode: Bracket Display';
+                matchBtn.style.background = '#6c757d';
+                bracketBtn.style.background = '#28a745';
+            }
+        }
+
+        // Bracket Functions
+        async function loadBracket() {
+            const bracket = await apiCall('/api/bracket');
+            if (bracket) {
+                currentBracket = bracket;
+                updateBracketDisplay();
+            }
+        }
+
+        function updateBracketDisplay() {
+            updateBracketStatus();
+            
+            // Don't automatically change display if user is explicitly managing it
+            // Only auto-switch for 'not_setup' status
+            if (currentBracket.status === 'not_setup') {
+                showBracketSetup();
+            }
+            // For 'setup' and 'running' status, let user control the display
+            // unless no display is currently shown
+            else {
+                const setupVisible = document.getElementById('bracketSetupSection').style.display !== 'none';
+                const displayVisible = document.getElementById('bracketDisplaySection').style.display !== 'none';
+                
+                // If neither is visible, default based on status
+                if (!setupVisible && !displayVisible) {
+                    if (currentBracket.status === 'setup') {
+                        showBracketSetup();
+                    } else {
+                        document.getElementById('bracketSetupSection').style.display = 'none';
+                        document.getElementById('bracketDisplaySection').style.display = 'block';
+                        renderBracket();
+                    }
+                }
+                // Otherwise, maintain current display and just update content
+                else if (setupVisible) {
+                    renderBracketSetup();
+                } else if (displayVisible) {
+                    renderBracket();
+                }
+            }
+        }
+
+        function updateBracketStatus() {
+            const statusEl = document.getElementById('bracketStatus');
+            const status = currentBracket.status || 'not_setup';
+            
+            statusEl.className = `bracket-status ${status}`;
+            
+            const statusMessages = {
+                'not_setup': '⚠️ Tournament bracket not set up',
+                'setup': '🔧 Bracket created - Ready to assign robots',
+                'running': '🏃 Tournament in progress',
+                'completed': '🏆 Tournament completed!'
+            };
+            
+            statusEl.textContent = statusMessages[status] || statusMessages['not_setup'];
+        }
+
+        function showBracketSetup() {
+            document.getElementById('bracketSetupSection').style.display = 'block';
+            document.getElementById('bracketDisplaySection').style.display = 'none';
+            renderBracketSetup();
+        }
+
+        function renderBracketSetup() {
+            const setupContainer = document.getElementById('bracketSetup');
+            setupContainer.innerHTML = '';
+            
+            let filledCount = 0;
+            
+            for (let i = 1; i <= 16; i++) {
+                const positionDiv = document.createElement('div');
+                positionDiv.className = 'bracket-position';
+                positionDiv.id = `pos_${i}`;
+                positionDiv.onclick = () => selectBracketPosition(i);
+                
+                const robot = currentBracket.bracket_positions?.[`pos_${i}`] || 'TBD';
+                positionDiv.textContent = robot === 'TBD' ? `Position ${i}` : robot;
+                
+                if (robot !== 'TBD') {
+                    positionDiv.classList.add('filled');
+                    filledCount++;
+                }
+                
+                setupContainer.appendChild(positionDiv);
+            }
+            
+            // Show finish button if all positions are filled and not yet running
+            const finishBtn = document.getElementById('finishBracketBtn');
+            if (filledCount === 16 && currentBracket.status === 'setup') {
+                finishBtn.style.display = 'inline-block';
+                finishBtn.textContent = '✅ Start Tournament';
+                updateStatus(`📋 All 16 positions filled! Ready to start tournament.`, 'success');
+            } else if (currentBracket.status === 'running') {
+                finishBtn.style.display = 'inline-block';
+                finishBtn.textContent = '👁️ View Bracket';
+                finishBtn.onclick = () => {
+                    document.getElementById('bracketSetupSection').style.display = 'none';
+                    document.getElementById('bracketDisplaySection').style.display = 'block';
+                    renderBracket();
+                    updateStatus('📊 Viewing tournament bracket', 'success');
+                };
+                if (filledCount === 16) {
+                    updateStatus(`⚙️ Tournament running - ${filledCount}/16 positions filled`, 'success');
+                } else {
+                    updateStatus(`⚙️ Tournament running - ${filledCount}/16 positions filled. Edit carefully!`, 'warning');
+                }
+            } else {
+                finishBtn.style.display = 'none';
+                if (currentBracket.status === 'setup') {
+                    updateStatus(`📋 ${filledCount}/16 positions filled. Select position then click robot.`, 'warning');
+                }
+            }
+        }
+
+        async function finishBracketSetup() {
+            // Check if all positions are filled
+            const filledCount = Object.values(currentBracket.bracket_positions || {}).filter(r => r !== 'TBD').length;
+            if (filledCount < 16) {
+                updateStatus('❌ All 16 positions must be filled before starting tournament', 'error');
+                return;
+            }
+            
+            // Call API to start tournament
+            const result = await apiCall('/api/bracket/start', 'POST');
+            if (result && result.success) {
+                // Update bracket data
+                currentBracket = result.bracket;
+                
+                // Force display to bracket view
+                document.getElementById('bracketSetupSection').style.display = 'none';
+                document.getElementById('bracketDisplaySection').style.display = 'block';
+                
+                // Render the bracket
+                renderBracket();
+                updateBracketStatus();
+                
+                updateStatus('🏁 Tournament started! Bracket is now active.', 'success');
+            } else {
+                updateStatus(`❌ ${result?.message || 'Failed to start tournament'}`, 'error');
+            }
+        }
+
+        function selectBracketPosition(position) {
+            if (selectedBracketPosition) {
+                document.getElementById(`pos_${selectedBracketPosition}`).style.background = '';
+            }
+            
+            selectedBracketPosition = position;
+            document.getElementById(`pos_${position}`).style.background = '#fff5f2';
+            updateStatus(`Position ${position} selected - Click a robot to assign`, 'warning');
+        }
+
+        async function setupBracket() {
+            const result = await apiCall('/api/bracket/setup', 'POST');
+            if (result && result.success) {
+                await loadBracket();
+                updateStatus('✅ Tournament bracket created - Assign robots manually', 'success');
+                document.getElementById('bracketSetupSection').style.display = 'block';
+                document.getElementById('bracketDisplaySection').style.display = 'none';
+            } else {
+                updateStatus('❌ Failed to create bracket', 'error');
+            }
+        }
+
+        async function randomAssignRobots() {
+            if (currentData.robots.length < 16) {
+                updateStatus(`❌ Need 16 robots for bracket, only ${currentData.robots.length} available`, 'error');
+                return;
+            }
+            
+            const result = await apiCall('/api/bracket/setup', 'POST', {
+                robots: currentData.robots,
+                random: true
+            });
+            
+            if (result && result.success) {
+                await loadBracket();
+                updateStatus('✅ Robots randomly assigned to bracket - Ready to start tournament!', 'success');
+                // Stay in setup mode so user can review assignments and manually start
+                renderBracketSetup();
+            } else {
+                updateStatus('❌ Failed to assign robots', 'error');
+            }
+        }
+
+        async function resetBracket() {
+            if (confirm('🚨 Reset tournament bracket? This will clear all matches and assignments.')) {
+                const result = await apiCall('/api/bracket/reset', 'POST');
+                if (result && result.success) {
+                    await loadBracket();
+                    updateStatus('🔄 Tournament bracket reset', 'success');
+                }
+            }
+        }
+
+        function renderBracket() {
+            const container = document.getElementById('bracketContainer');
+            container.innerHTML = '';
+            
+            if (!currentBracket.matches || Object.keys(currentBracket.matches).length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #6c757d;">No bracket data available</p>';
+                return;
+            }
+            
+            // Round 1
+            const round1 = createRoundDiv('Round 1', ['r1_m1', 'r1_m2', 'r1_m3', 'r1_m4', 'r1_m5', 'r1_m6', 'r1_m7', 'r1_m8']);
+            container.appendChild(round1);
+            
+            // Quarterfinals
+            const qf = createRoundDiv('Quarterfinals', ['qf_m1', 'qf_m2', 'qf_m3', 'qf_m4']);
+            container.appendChild(qf);
+            
+            // Semifinals
+            const sf = createRoundDiv('Semifinals', ['sf_m1', 'sf_m2']);
+            container.appendChild(sf);
+            
+            // Finals
+            const finals = createRoundDiv('Finals', ['final']);
+            container.appendChild(finals);
+        }
+
+        function createRoundDiv(roundName, matchIds) {
+            const roundDiv = document.createElement('div');
+            roundDiv.className = 'bracket-round';
+            
+            const header = document.createElement('h4');
+            header.textContent = roundName;
+            roundDiv.appendChild(header);
+            
+            matchIds.forEach(matchId => {
+                if (currentBracket.matches[matchId]) {
+                    const matchDiv = createMatchDiv(matchId, currentBracket.matches[matchId]);
+                    roundDiv.appendChild(matchDiv);
+                }
+            });
+            
+            return roundDiv;
+        }
+
+        function createMatchDiv(matchId, match) {
+            const matchDiv = document.createElement('div');
+            matchDiv.className = 'bracket-match';
+            matchDiv.id = `match_${matchId}`;
+            
+            if (match.completed) {
+                matchDiv.classList.add('completed');
+            }
+            
+            if (currentBracket.current_match_id === matchId) {
+                matchDiv.classList.add('current');
+            }
+            
+            matchDiv.onclick = () => selectBracketMatch(matchId);
+            
+            const header = document.createElement('div');
+            header.className = 'bracket-match-header';
+            header.textContent = matchId.toUpperCase().replace('_', ' ');
+            matchDiv.appendChild(header);
+            
+            const robotsDiv = document.createElement('div');
+            robotsDiv.className = 'bracket-robots';
+            
+            // Robot 1
+            const robot1Div = document.createElement('div');
+            robot1Div.className = 'bracket-robot';
+            robot1Div.textContent = match.robot1;
+            if (match.winner === match.robot1) {
+                robot1Div.classList.add('winner');
+            }
+            // Add click handler for direct winner selection
+            if (!match.completed && match.robot1 !== 'TBD' && !match.robot1.includes('winner_')) {
+                robot1Div.classList.add('clickable');
+                robot1Div.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    setMatchWinner(matchId, match.robot1);
+                });
+                robot1Div.title = 'Click to set as winner';
+            }
+            
+            // Robot 2
+            const robot2Div = document.createElement('div');
+            robot2Div.className = 'bracket-robot';
+            robot2Div.textContent = match.robot2;
+            if (match.winner === match.robot2) {
+                robot2Div.classList.add('winner');
+            }
+            // Add click handler for direct winner selection
+            if (!match.completed && match.robot2 !== 'TBD' && !match.robot2.includes('winner_')) {
+                robot2Div.classList.add('clickable');
+                robot2Div.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    setMatchWinner(matchId, match.robot2);
+                });
+                robot2Div.title = 'Click to set as winner';
+            }
+            
+            robotsDiv.appendChild(robot1Div);
+            robotsDiv.appendChild(robot2Div);
+            matchDiv.appendChild(robotsDiv);
+            
+            return matchDiv;
+        }
+
+        async function setMatchWinner(matchId, winner) {
+            console.log('setMatchWinner called:', matchId, winner);
+            updateStatus(`Setting winner: ${winner} for ${matchId}`, 'warning');
+            
+            if (confirm(`Set ${winner} as winner of ${matchId.toUpperCase().replace('_', ' ')}?`)) {
+                const result = await apiCall(`/api/bracket/match/${matchId}`, 'POST', {
+                    winner: winner
+                });
+                if (result && result.success) {
+                    await loadBracket();
+                    updateStatus(`🏆 ${winner} wins ${matchId.toUpperCase().replace('_', ' ')}! Advanced to next round.`, 'success');
+                } else {
+                    updateStatus(`❌ ${result?.message || 'Failed to set winner'}`, 'error');
+                }
+            } else {
+                updateStatus('Winner selection cancelled', 'warning');
+            }
+        }
+
+        async function selectBracketMatch(matchId) {
+            const match = currentBracket.matches[matchId];
+            if (!match) return;
+            
+            if (match.completed) {
+                updateStatus(`Match ${matchId} already completed. Winner: ${match.winner}`, 'warning');
+                return;
+            }
+            
+            if (match.robot1.includes('winner_') || match.robot2.includes('winner_')) {
+                updateStatus(`Match ${matchId} waiting for previous matches to complete`, 'warning');
+                return;
+            }
+            
+            // Set as current match
+            const result = await apiCall('/api/bracket/current', 'POST', { match_id: matchId });
+            if (result && result.success) {
+                await loadData();
+                updateStatus(`✅ Current match set: ${match.robot1} vs ${match.robot2}`, 'success');
+            }
+        }
+
+        async function getNextMatch() {
+            const result = await apiCall('/api/bracket/current');
+            if (result) {
+                if (result.suggested_match_id) {
+                    await selectBracketMatch(result.suggested_match_id);
+                } else if (result.current_match_id) {
+                    updateStatus(`Current match: ${result.match.robot1} vs ${result.match.robot2}`, 'success');
+                } else {
+                    updateStatus('No available matches', 'warning');
+                }
+            }
+        }
+
+        function editBracketSetup() {
+            document.getElementById('bracketSetupSection').style.display = 'block';
+            document.getElementById('bracketDisplaySection').style.display = 'none';
+            renderBracketSetup();
+            
+            if (currentBracket.status === 'running') {
+                updateStatus('⚙️ Editing active tournament - Changes will update matches immediately', 'warning');
+            } else {
+                updateStatus('⚙️ Bracket setup mode - Click positions to reassign robots', 'warning');
             }
         }
 
@@ -435,6 +1045,45 @@
 
         // Roboter auswählen
         async function selectRobot(robotName) {
+            // Handle bracket position assignment
+            if (selectedBracketPosition) {
+                const result = await apiCall('/api/bracket/assign', 'POST', {
+                    position: `pos_${selectedBracketPosition}`,
+                    robot: robotName
+                });
+                
+                if (result && result.success) {
+                    await loadBracket();
+                    updateStatus(`✅ ${robotName} assigned to position ${selectedBracketPosition}`, 'success');
+                    
+                    // Clear selection
+                    document.getElementById(`pos_${selectedBracketPosition}`).style.background = '';
+                    selectedBracketPosition = null;
+                    return;
+                } else {
+                    updateStatus(`❌ ${result?.message || 'Failed to assign robot'}`, 'error');
+                    return;
+                }
+            }
+            
+            // Handle current match winner selection
+            if (currentBracket.current_match_id) {
+                const match = currentBracket.matches[currentBracket.current_match_id];
+                if (match && !match.completed && (robotName === match.robot1 || robotName === match.robot2)) {
+                    if (confirm(`Set ${robotName} as winner of current match?`)) {
+                        const result = await apiCall(`/api/bracket/match/${currentBracket.current_match_id}`, 'POST', {
+                            winner: robotName
+                        });
+                        if (result && result.success) {
+                            await loadData();
+                            updateStatus(`✅ ${robotName} wins! Advancing to next round.`, 'success');
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            // Handle regular slot selection
             if (!selectedSlot) {
                 updateStatus('⚠️ Bitte erst einen Slot auswählen!', 'error');
                 return;

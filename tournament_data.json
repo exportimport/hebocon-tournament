@@ -9,13 +9,153 @@
     "Zitter-Zerstörer",
     "Krach-Kiste",
     "Wums-Wurm",
+    "Rüttel-Rex",
     "Kipp-Bot",
-    "Vibro-Fighter"
+    "Vibro-Fighter",
+    "123123",
+    "1111",
+    "4324432",
+    "232",
+    "234324"
   ],
   "current_match": {
-    "robot1": "Wackel-Bot 3000",
-    "robot2": "Schrott-König",
-    "round": "Halbfinale"
+    "robot1": "Zitter-Zerstörer",
+    "robot2": "232",
+    "round": "round1"
   },
-  "last_updated": "2025-08-19T23:04:14.736388"
+  "bracket": {
+    "tournament_id": "e7b8c4b7-937b-4412-b6a3-afbb3bed7dcc",
+    "status": "setup",
+    "current_round": "round1",
+    "current_match_id": "r1_m8",
+    "matches": {
+      "r1_m1": {
+        "robot1": "Mega-Wackler",
+        "robot2": "Schrott-König",
+        "winner": "Schrott-König",
+        "completed": true,
+        "round": "round1"
+      },
+      "r1_m2": {
+        "robot1": "Vibro-Fighter",
+        "robot2": "Wackel-Bot 3000",
+        "winner": "Vibro-Fighter",
+        "completed": true,
+        "round": "round1"
+      },
+      "r1_m3": {
+        "robot1": "Kipp-Bot",
+        "robot2": "1111",
+        "winner": null,
+        "completed": false,
+        "round": "round1"
+      },
+      "r1_m4": {
+        "robot1": "123123",
+        "robot2": "4324432",
+        "winner": null,
+        "completed": false,
+        "round": "round1"
+      },
+      "r1_m5": {
+        "robot1": "Sturz-Roboter",
+        "robot2": "Chaos-Maschine",
+        "winner": null,
+        "completed": false,
+        "round": "round1"
+      },
+      "r1_m6": {
+        "robot1": "Bumm-Bot",
+        "robot2": "Wums-Wurm",
+        "winner": null,
+        "completed": false,
+        "round": "round1"
+      },
+      "r1_m7": {
+        "robot1": "Krach-Kiste",
+        "robot2": "Rüttel-Rex",
+        "winner": null,
+        "completed": false,
+        "round": "round1"
+      },
+      "r1_m8": {
+        "robot1": "Zitter-Zerstörer",
+        "robot2": "232",
+        "winner": null,
+        "completed": false,
+        "round": "round1"
+      },
+      "qf_m1": {
+        "robot1": "Schrott-König",
+        "robot2": "Vibro-Fighter",
+        "winner": null,
+        "completed": false,
+        "round": "quarterfinals"
+      },
+      "qf_m2": {
+        "robot1": "winner_r1_m3",
+        "robot2": "winner_r1_m4",
+        "winner": null,
+        "completed": false,
+        "round": "quarterfinals"
+      },
+      "qf_m3": {
+        "robot1": "winner_r1_m5",
+        "robot2": "winner_r1_m6",
+        "winner": null,
+        "completed": false,
+        "round": "quarterfinals"
+      },
+      "qf_m4": {
+        "robot1": "winner_r1_m7",
+        "robot2": "winner_r1_m8",
+        "winner": null,
+        "completed": false,
+        "round": "quarterfinals"
+      },
+      "sf_m1": {
+        "robot1": "winner_qf_m1",
+        "robot2": "winner_qf_m2",
+        "winner": null,
+        "completed": false,
+        "round": "semifinals"
+      },
+      "sf_m2": {
+        "robot1": "winner_qf_m3",
+        "robot2": "winner_qf_m4",
+        "winner": null,
+        "completed": false,
+        "round": "semifinals"
+      },
+      "final": {
+        "robot1": "winner_sf_m1",
+        "robot2": "winner_sf_m2",
+        "winner": null,
+        "completed": false,
+        "round": "finals"
+      }
+    },
+    "bracket_positions": {
+      "pos_1": "Mega-Wackler",
+      "pos_2": "Schrott-König",
+      "pos_3": "Vibro-Fighter",
+      "pos_4": "Wackel-Bot 3000",
+      "pos_5": "Kipp-Bot",
+      "pos_6": "1111",
+      "pos_7": "123123",
+      "pos_8": "4324432",
+      "pos_9": "Sturz-Roboter",
+      "pos_10": "Chaos-Maschine",
+      "pos_11": "Bumm-Bot",
+      "pos_12": "Wums-Wurm",
+      "pos_13": "Krach-Kiste",
+      "pos_14": "Rüttel-Rex",
+      "pos_15": "Zitter-Zerstörer",
+      "pos_16": "232"
+    }
+  },
+  "overlay_settings": {
+    "display_mode": "bracket"
+  },
+  "last_updated": "2025-08-20T00:33:45.240346"
 }

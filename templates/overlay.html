@@ -236,6 +236,156 @@
         .error-state.visible {
             display: block;
         }
+
+        /* Bracket Display Styles */
+        .bracket-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .bracket-overlay.visible {
+            display: block;
+        }
+
+        .bracket-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .bracket-header h1 {
+            font-size: 36px;
+            color: #ff6b35;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .bracket-header p {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .bracket-grid {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1.5fr 1fr;
+            gap: 15px;
+            height: calc(100vh - 120px);
+            max-height: 980px;
+            overflow: hidden;
+        }
+
+        .bracket-round-overlay {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 8px;
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            height: 100%;
+        }
+
+        .bracket-round-title {
+            color: #ff6b35;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            flex-shrink: 0;
+        }
+
+        .bracket-match-overlay {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            padding: 6px;
+            margin-bottom: 4px;
+            transition: all 0.3s ease;
+            min-height: 0;
+        }
+
+        .bracket-match-overlay.current {
+            border-color: #ff6b35;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+            background: rgba(255, 107, 53, 0.2);
+        }
+
+        .bracket-match-overlay.completed {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.2);
+        }
+
+        .bracket-match-id {
+            color: #ff6b35;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+
+        .bracket-participants {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .bracket-participant {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .bracket-participant.winner {
+            background: rgba(40, 167, 69, 0.3);
+            border-color: #28a745;
+            color: #90EE90;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .bracket-participant.pending {
+            color: #ccc;
+            font-style: italic;
+        }
+
+
+        /* Path to Victory */
+        .path-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: 1px solid #ff6b35;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .path-indicator.visible {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -273,10 +423,29 @@
         <div class="error-state" id="errorState">
             ❌ Keine Verbindung zum Server
         </div>
+
+
+        <!-- Bracket Overlay -->
+        <div class="bracket-overlay" id="bracketOverlay">
+            <div class="bracket-header">
+                <h1>TOURNAMENT BRACKET</h1>
+                <p id="bracketStatus">16-Player Single Elimination</p>
+            </div>
+            
+            <div class="bracket-grid" id="bracketGrid">
+                <!-- Bracket rounds will be populated here -->
+            </div>
+
+            <div class="path-indicator" id="pathIndicator">
+                Path to Victory: Round 1 → Quarterfinals → Semifinals → Finals
+            </div>
+        </div>
     </div>
 
     <script>
         let lastUpdateTime = null;
+        let currentBracket = {};
+        let displayMode = 'match'; // 'match' or 'bracket'
 
         // Daten vom Server laden
         async function loadData() {
@@ -284,8 +453,15 @@
                 document.getElementById('loadingIndicator').classList.add('visible');
                 document.getElementById('errorState').classList.remove('visible');
                 
-                const response = await fetch('/api/data');
-                const data = await response.json();
+                const [dataResponse, bracketResponse, overlayModeResponse] = await Promise.all([
+                    fetch('/api/data'),
+                    fetch('/api/bracket'),
+                    fetch('/api/overlay/mode')
+                ]);
+                
+                const data = await dataResponse.json();
+                const bracket = await bracketResponse.json();
+                const overlayMode = await overlayModeResponse.json();
                 
                 if (data && data.current_match) {
                     // Roboternamen aktualisieren
@@ -298,6 +474,19 @@
                     updateStatusIndicator('LIVE');
                 }
                 
+                // Update bracket data
+                if (bracket) {
+                    currentBracket = bracket;
+                }
+                
+                // Check for display mode change from server
+                if (overlayMode && overlayMode.mode && overlayMode.mode !== displayMode) {
+                    displayMode = overlayMode.mode;
+                    updateDisplayMode();
+                } else if (displayMode === 'bracket') {
+                    renderBracketOverlay();
+                }
+                
                 document.getElementById('loadingIndicator').classList.remove('visible');
                 
             } catch (error) {
@@ -306,6 +495,140 @@
                 document.getElementById('errorState').classList.add('visible');
                 updateStatusIndicator('OFFLINE');
             }
+        }
+
+        // Update display based on server mode
+        function updateDisplayMode() {
+            const bracketOverlay = document.getElementById('bracketOverlay');
+            
+            if (displayMode === 'bracket') {
+                bracketOverlay.classList.add('visible');
+                renderBracketOverlay();
+            } else {
+                bracketOverlay.classList.remove('visible');
+            }
+        }
+
+        // Toggle between match and bracket display (manual override)
+        function toggleDisplayMode() {
+            if (displayMode === 'match') {
+                displayMode = 'bracket';
+            } else {
+                displayMode = 'match';
+            }
+            updateDisplayMode();
+        }
+
+        // Render bracket overlay
+        function renderBracketOverlay() {
+            const grid = document.getElementById('bracketGrid');
+            grid.innerHTML = '';
+            
+            if (!currentBracket.matches || Object.keys(currentBracket.matches).length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: white; font-size: 24px;">No tournament data available</div>';
+                return;
+            }
+            
+            // Create rounds
+            const rounds = [
+                { name: 'Round 1', matches: ['r1_m1', 'r1_m2', 'r1_m3', 'r1_m4', 'r1_m5', 'r1_m6', 'r1_m7', 'r1_m8'] },
+                { name: 'Quarterfinals', matches: ['qf_m1', 'qf_m2', 'qf_m3', 'qf_m4'] },
+                { name: 'Semifinals', matches: ['sf_m1', 'sf_m2'] },
+                { name: 'Finals', matches: ['final'] }
+            ];
+            
+            rounds.forEach(round => {
+                const roundDiv = createBracketRound(round.name, round.matches);
+                grid.appendChild(roundDiv);
+            });
+            
+            updateBracketStatus();
+        }
+
+        function createBracketRound(roundName, matchIds) {
+            const roundDiv = document.createElement('div');
+            roundDiv.className = 'bracket-round-overlay';
+            
+            const title = document.createElement('div');
+            title.className = 'bracket-round-title';
+            title.textContent = roundName;
+            roundDiv.appendChild(title);
+            
+            matchIds.forEach(matchId => {
+                if (currentBracket.matches[matchId]) {
+                    const matchDiv = createBracketMatch(matchId, currentBracket.matches[matchId]);
+                    roundDiv.appendChild(matchDiv);
+                }
+            });
+            
+            return roundDiv;
+        }
+
+        function createBracketMatch(matchId, match) {
+            const matchDiv = document.createElement('div');
+            matchDiv.className = 'bracket-match-overlay';
+            
+            if (match.completed) {
+                matchDiv.classList.add('completed');
+            }
+            
+            if (currentBracket.current_match_id === matchId) {
+                matchDiv.classList.add('current');
+            }
+            
+            const idDiv = document.createElement('div');
+            idDiv.className = 'bracket-match-id';
+            idDiv.textContent = matchId.toUpperCase().replace('_', ' ');
+            matchDiv.appendChild(idDiv);
+            
+            const participantsDiv = document.createElement('div');
+            participantsDiv.className = 'bracket-participants';
+            
+            // Robot 1
+            const robot1Div = document.createElement('div');
+            robot1Div.className = 'bracket-participant';
+            if (match.robot1.includes('winner_') || match.robot1 === 'TBD') {
+                robot1Div.classList.add('pending');
+                robot1Div.textContent = match.robot1.includes('winner_') ? 'TBD' : match.robot1;
+            } else {
+                robot1Div.textContent = match.robot1;
+            }
+            if (match.winner === match.robot1) {
+                robot1Div.classList.add('winner');
+            }
+            
+            // Robot 2
+            const robot2Div = document.createElement('div');
+            robot2Div.className = 'bracket-participant';
+            if (match.robot2.includes('winner_') || match.robot2 === 'TBD') {
+                robot2Div.classList.add('pending');
+                robot2Div.textContent = match.robot2.includes('winner_') ? 'TBD' : match.robot2;
+            } else {
+                robot2Div.textContent = match.robot2;
+            }
+            if (match.winner === match.robot2) {
+                robot2Div.classList.add('winner');
+            }
+            
+            participantsDiv.appendChild(robot1Div);
+            participantsDiv.appendChild(robot2Div);
+            matchDiv.appendChild(participantsDiv);
+            
+            return matchDiv;
+        }
+
+        function updateBracketStatus() {
+            const statusEl = document.getElementById('bracketStatus');
+            const status = currentBracket.status || 'not_setup';
+            
+            const statusMessages = {
+                'not_setup': 'Tournament bracket not set up',
+                'setup': 'Bracket created - Ready to start',
+                'running': 'Tournament in progress',
+                'completed': 'Tournament completed!'
+            };
+            
+            statusEl.textContent = statusMessages[status] || statusMessages['not_setup'];
         }
 
         // Status Indicator aktualisieren
@@ -344,17 +667,22 @@
         // Connection Check alle 5 Sekunden
         setInterval(checkConnection, 5000);
 
-        // Tastatur Shortcuts für Debugging
+        // Tastatur Shortcuts
         document.addEventListener('keydown', function(event) {
             if (event.key === 'r' || event.key === 'R') {
                 loadData();
+            }
+            if (event.key === 'b' || event.key === 'B') {
+                toggleDisplayMode();
             }
             if (event.key === 'i' || event.key === 'I') {
                 console.log('Overlay Info:', {
                     lastUpdate: lastUpdateTime,
                     currentRobot1: document.getElementById('robot1').textContent,
                     currentRobot2: document.getElementById('robot2').textContent,
-                    currentRound: document.getElementById('roundDisplay').textContent
+                    currentRound: document.getElementById('roundDisplay').textContent,
+                    displayMode: displayMode,
+                    bracketStatus: currentBracket.status
                 });
             }
         });

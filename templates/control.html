@@ -928,6 +928,32 @@
             robotsDiv.appendChild(robot2Div);
             matchDiv.appendChild(robotsDiv);
             
+            // Add undo button for completed matches
+            if (match.completed && match.winner) {
+                const undoDiv = document.createElement('div');
+                undoDiv.style.marginTop = '8px';
+                undoDiv.style.textAlign = 'center';
+                
+                const undoButton = document.createElement('button');
+                undoButton.textContent = '↶ Undo';
+                undoButton.style.background = '#dc3545';
+                undoButton.style.color = 'white';
+                undoButton.style.border = 'none';
+                undoButton.style.padding = '4px 12px';
+                undoButton.style.borderRadius = '4px';
+                undoButton.style.fontSize = '11px';
+                undoButton.style.cursor = 'pointer';
+                undoButton.title = `Undo result: ${match.winner} wins`;
+                
+                undoButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    undoMatchResult(matchId);
+                });
+                
+                undoDiv.appendChild(undoButton);
+                matchDiv.appendChild(undoDiv);
+            }
+            
             return matchDiv;
         }
 
@@ -947,6 +973,28 @@
                 }
             } else {
                 updateStatus('Winner selection cancelled', 'warning');
+            }
+        }
+
+        async function undoMatchResult(matchId) {
+            const match = currentBracket.matches[matchId];
+            if (!match || !match.completed) {
+                updateStatus('❌ Match is not completed', 'error');
+                return;
+            }
+
+            const matchName = matchId.toUpperCase().replace('_', ' ');
+            if (confirm(`🚨 Undo result for ${matchName}?\n\nThis will:\n- Remove ${match.winner} as winner\n- Reset the match to not completed\n- Clear winner from next round matches\n\nNote: If dependent matches are completed, they must be undone first.`)) {
+                updateStatus(`Undoing result for ${matchName}...`, 'warning');
+                
+                const result = await apiCall(`/api/bracket/match/${matchId}/undo`, 'POST');
+                if (result && result.success) {
+                    await loadBracket();
+                    await loadData(); // Refresh current match data too
+                    updateStatus(`↶ ${matchName} result undone successfully`, 'success');
+                } else {
+                    updateStatus(`❌ ${result?.message || 'Failed to undo match result'}`, 'error');
+                }
             }
         }
 

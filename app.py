@@ -170,6 +170,53 @@ def _update_dependent_matches(bracket, completed_match_id, winner):
             if next_match_id in bracket['matches']:
                 bracket['matches'][next_match_id][robot_slot] = winner
 
+def undo_match_result(bracket, match_id):
+    """Undo match result and remove winner from dependent matches"""
+    if match_id not in bracket['matches']:
+        return False, "Match not found"
+    
+    match = bracket['matches'][match_id]
+    if not match['completed']:
+        return False, "Match is not completed yet"
+    
+    # Check if any dependent matches have been completed
+    # If so, they need to be undone first
+    dependencies = {
+        'r1_m1': [('qf_m1', 'robot1')], 'r1_m2': [('qf_m1', 'robot2')],
+        'r1_m3': [('qf_m2', 'robot1')], 'r1_m4': [('qf_m2', 'robot2')],
+        'r1_m5': [('qf_m3', 'robot1')], 'r1_m6': [('qf_m3', 'robot2')],
+        'r1_m7': [('qf_m4', 'robot1')], 'r1_m8': [('qf_m4', 'robot2')],
+        'qf_m1': [('sf_m1', 'robot1')], 'qf_m2': [('sf_m1', 'robot2')],
+        'qf_m3': [('sf_m2', 'robot1')], 'qf_m4': [('sf_m2', 'robot2')],
+        'sf_m1': [('final', 'robot1')], 'sf_m2': [('final', 'robot2')]
+    }
+    
+    # Check if there are completed dependent matches
+    dependent_completed = []
+    if match_id in dependencies:
+        for next_match_id, robot_slot in dependencies[match_id]:
+            if next_match_id in bracket['matches'] and bracket['matches'][next_match_id]['completed']:
+                dependent_completed.append(next_match_id)
+    
+    if dependent_completed:
+        return False, f"Cannot undo: dependent matches {', '.join(dependent_completed)} must be undone first"
+    
+    # Store the winner before clearing
+    winner = match['winner']
+    
+    # Undo the match
+    match['winner'] = None
+    match['completed'] = False
+    
+    # Remove winner from dependent matches
+    if match_id in dependencies:
+        for next_match_id, robot_slot in dependencies[match_id]:
+            if next_match_id in bracket['matches']:
+                # Reset to placeholder for winner references
+                bracket['matches'][next_match_id][robot_slot] = f'winner_{match_id}'
+    
+    return True, f"Match {match_id} result undone successfully"
+
 def get_next_match(bracket):
     """Get the next uncompleted match in bracket order"""
     match_order = [
@@ -309,6 +356,23 @@ def update_match_result(match_id):
                 'round': match['round']
             }
         
+        save_data(data)
+        return jsonify({'success': True, 'message': message, 'bracket': bracket})
+    else:
+        return jsonify({'success': False, 'message': message})
+
+@app.route('/api/bracket/match/<match_id>/undo', methods=['POST'])
+def undo_match_result_endpoint(match_id):
+    """Undo match result and remove winner from dependent matches"""
+    data = load_data()
+    
+    if 'bracket' not in data:
+        return jsonify({'success': False, 'message': 'No tournament bracket found'})
+    
+    bracket = data['bracket']
+    success, message = undo_match_result(bracket, match_id)
+    
+    if success:
         save_data(data)
         return jsonify({'success': True, 'message': message, 'bracket': bracket})
     else:
@@ -502,7 +566,7 @@ if __name__ == '__main__':
     # Template-Ordner erstellen falls nicht vorhanden
     os.makedirs('templates', exist_ok=True)
     
-    print("🤖 Hebocon Tournament Server")
+    print("Hebocon Tournament Server")
     print("=" * 40)
     print("Steuerung:    http://localhost:5005")
     print("OBS Overlay:  http://localhost:5005/overlay")

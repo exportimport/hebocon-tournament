@@ -592,7 +592,10 @@
                 // Update timer
                 if (timer) {
                     currentTimer = timer;
+                    console.log('Timer data received:', timer);
                     updateTimerDisplay();
+                } else {
+                    console.log('No timer data received');
                 }
                 
                 document.getElementById('loadingIndicator').classList.remove('visible');
@@ -830,6 +833,13 @@
         // Initialisierung
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🤖 Hebocon Overlay gestartet');
+            
+            // Force show timer immediately
+            const timerDisplay = document.getElementById('timerDisplay');
+            if (timerDisplay) {
+                timerDisplay.style.display = 'block';
+            }
+            
             loadData();
             startAutoUpdate();
         });

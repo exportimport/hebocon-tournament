@@ -1,0 +1,16 @@
+{
+  "name": "hebocon-tournament-server",
+  "version": "1.0.0",
+  "description": "Tournament management system for Hebocon robot competitions",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui"
+  },
+  "keywords": ["hebocon", "tournament", "robotics", "flask"],
+  "author": "Hebocon Tournament Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}

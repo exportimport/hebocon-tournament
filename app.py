@@ -48,6 +48,9 @@ DEFAULT_DATA = {
     'overlay_settings': {
         'display_mode': 'match'  # 'match' or 'bracket'
     },
+    'tournament_settings': {
+        'title': 'HEBOCON 2025'
+    },
     'timer': {
         'duration': 180,  # seconds (3 minutes default)
         'start_time': None,
@@ -705,6 +708,31 @@ def reset_winner_animation():
     
     save_data(data)
     return jsonify({'success': True})
+
+@app.route('/api/tournament/title', methods=['GET', 'POST'])
+def handle_tournament_title():
+    """Get/set tournament title"""
+    data = load_data()
+    
+    # Ensure tournament_settings exists
+    if 'tournament_settings' not in data:
+        data['tournament_settings'] = {'title': 'HEBOCON 2025'}
+    
+    if request.method == 'POST':
+        request_data = request.json or {}
+        title = request_data.get('title', '').strip()
+        
+        if not title:
+            return jsonify({'success': False, 'message': 'Title cannot be empty'})
+        
+        if len(title) > 50:
+            return jsonify({'success': False, 'message': 'Title too long (max 50 characters)'})
+        
+        data['tournament_settings']['title'] = title
+        save_data(data)
+        return jsonify({'success': True, 'title': title})
+    
+    return jsonify({'title': data['tournament_settings'].get('title', 'HEBOCON 2025')})
 
 def get_timer_status(timer_data):
     """Calculate current timer status"""

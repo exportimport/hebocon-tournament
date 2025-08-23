@@ -589,7 +589,7 @@
 
         <!-- Tournament Header -->
         <div class="tournament-header">
-            <h1 class="tournament-title">HEBOCON 2025</h1>
+            <h1 class="tournament-title" id="tournamentTitle">HEBOCON 2025</h1>
             <p class="round-display" id="roundDisplay">Viertelfinale</p>
         </div>
 
@@ -673,6 +673,11 @@
                     // Update Zeit merken
                     lastUpdateTime = new Date();
                     updateStatusIndicator('LIVE');
+                }
+
+                // Update tournament title
+                if (data && data.tournament_settings && data.tournament_settings.title) {
+                    document.getElementById('tournamentTitle').textContent = data.tournament_settings.title;
                 }
 
                 // Handle winner animation

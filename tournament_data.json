@@ -156,17 +156,20 @@
   "overlay_settings": {
     "display_mode": "match"
   },
-  "last_updated": "2025-08-23T18:55:00.418226",
+  "last_updated": "2025-08-23T19:01:03.627151",
   "timer": {
     "duration": 120,
-    "start_time": 1755967004.4019666,
-    "is_running": true,
+    "start_time": null,
+    "is_running": false,
     "is_paused": false,
     "elapsed_time": 0
   },
   "winner_animation": {
-    "winner": "robot1",
-    "animation_state": "winner_announced",
-    "animation_timestamp": 1755968100.4182208
+    "winner": null,
+    "animation_state": "normal",
+    "animation_timestamp": null
+  },
+  "tournament_settings": {
+    "title": "HEBOCON 2025"
   }
 }

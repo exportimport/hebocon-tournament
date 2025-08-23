@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@anthropic-ai/mcp-server-playwright"],
+      "env": {
+        "PLAYWRIGHT_BROWSER": "chromium",
+        "PLAYWRIGHT_HEADLESS": "true"
+      }
+    }
+  },
+  "testConfig": {
+    "baseURL": "http://localhost:5005",
+    "timeout": 30000,
+    "retries": 2,
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "screenshotOnFailure": true,
+    "videoOnFailure": true
+  },
+  "endpoints": {
+    "controlPanel": "/",
+    "overlay": "/overlay", 
+    "apiData": "/api/data",
+    "apiRobots": "/api/robots",
+    "apiMatch": "/api/match",
+    "apiBracket": "/api/bracket",
+    "apiTimer": "/api/timer"
+  }
+}

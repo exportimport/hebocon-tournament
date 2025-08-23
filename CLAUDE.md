@@ -61,8 +61,12 @@ pip install -r requirements.txt
 ### Frontend Features
 - Real-time robot selection and match setup
 - Tournament round management (Vorrunde, Viertelfinale, Halbfinale, etc.)
+- 16-player single-elimination bracket system
+- Battle timer with configurable duration and visual status
+- Winner animation system with direct winner selection
 - Auto-refresh every 5 seconds on control panel
 - Keyboard shortcuts (1/2 for robot slots, F5 for refresh)
 - Responsive design for different screen sizes
+- OBS overlay with match and bracket display modes
 
 The system is designed for live tournament broadcasting with minimal latency between control actions and overlay updates.

@@ -579,9 +579,14 @@ def handle_timer():
         data['timer'] = {
             'duration': 180,
             'start_time': None,
+            'elapsed_time': 0,
             'is_running': False,
             'is_paused': False
         }
+    
+    # Ensure elapsed_time exists for existing timers
+    if 'elapsed_time' not in data['timer']:
+        data['timer']['elapsed_time'] = 0
     
     if request.method == 'POST':
         request_data = request.json or {}
@@ -593,18 +598,31 @@ def handle_timer():
             action = request_data['action']
             
             if action == 'start':
-                data['timer']['start_time'] = time.time()
+                if data['timer']['is_paused']:
+                    # Resume from pause - restart timer with remaining time
+                    data['timer']['start_time'] = time.time()
+                else:
+                    # Fresh start
+                    data['timer']['start_time'] = time.time()
+                    data['timer']['elapsed_time'] = 0
                 data['timer']['is_running'] = True
                 data['timer']['is_paused'] = False
             elif action == 'stop':
                 data['timer']['start_time'] = None
+                data['timer']['elapsed_time'] = 0
                 data['timer']['is_running'] = False
                 data['timer']['is_paused'] = False
             elif action == 'pause':
+                if data['timer']['is_running'] and data['timer']['start_time']:
+                    # Calculate elapsed time up to now
+                    current_elapsed = time.time() - data['timer']['start_time']
+                    data['timer']['elapsed_time'] += current_elapsed
                 data['timer']['is_paused'] = True
                 data['timer']['is_running'] = False
+                data['timer']['start_time'] = None
             elif action == 'reset':
                 data['timer']['start_time'] = None
+                data['timer']['elapsed_time'] = 0
                 data['timer']['is_running'] = False
                 data['timer']['is_paused'] = False
         
@@ -617,13 +635,20 @@ def get_timer_status(timer_data):
     """Calculate current timer status"""
     current_time = time.time()
     
+    # Ensure elapsed_time exists for backward compatibility
+    if 'elapsed_time' not in timer_data:
+        timer_data['elapsed_time'] = 0
+    
     if timer_data['is_running'] and timer_data['start_time']:
-        elapsed = current_time - timer_data['start_time']
-        remaining = max(0, timer_data['duration'] - elapsed)
-    elif timer_data['is_paused'] and timer_data['start_time']:
-        elapsed = current_time - timer_data['start_time'] 
-        remaining = max(0, timer_data['duration'] - elapsed)
+        # Timer is running - calculate total elapsed time
+        current_session_elapsed = current_time - timer_data['start_time']
+        total_elapsed = timer_data['elapsed_time'] + current_session_elapsed
+        remaining = max(0, timer_data['duration'] - total_elapsed)
+    elif timer_data['is_paused']:
+        # Timer is paused - use stored elapsed time
+        remaining = max(0, timer_data['duration'] - timer_data['elapsed_time'])
     else:
+        # Timer is stopped/reset
         remaining = timer_data['duration']
     
     minutes = int(remaining // 60)
@@ -635,7 +660,8 @@ def get_timer_status(timer_data):
         'remaining_formatted': f"{minutes:02d}:{seconds:02d}",
         'is_running': timer_data['is_running'],
         'is_paused': timer_data['is_paused'],
-        'start_time': timer_data['start_time']
+        'start_time': timer_data['start_time'],
+        'elapsed_time': timer_data['elapsed_time']
     }
 
 if __name__ == '__main__':

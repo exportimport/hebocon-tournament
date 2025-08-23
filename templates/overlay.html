@@ -464,6 +464,21 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
+        .timer-display.paused {
+            border-color: #6c757d;
+            color: #6c757d;
+            animation: timer-paused 1.5s infinite;
+        }
+
+        @keyframes timer-paused {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
     </style>
 </head>
 <body>
@@ -729,20 +744,22 @@
             const timerDisplay = document.getElementById('timerDisplay');
             const timerValue = document.getElementById('timerValue');
             
-            if (!currentTimer || !currentTimer.remaining_formatted) {
+            if (!currentTimer) {
                 timerDisplay.classList.remove('visible');
                 return;
             }
             
-            // Show timer
+            // Always show timer when timer data exists
             timerDisplay.classList.add('visible');
-            timerValue.textContent = currentTimer.remaining_formatted;
+            timerValue.textContent = currentTimer.remaining_formatted || '00:00';
             
             // Remove all status classes
-            timerDisplay.classList.remove('running', 'warning', 'critical');
+            timerDisplay.classList.remove('running', 'warning', 'critical', 'paused');
             
             // Add appropriate status class
-            if (currentTimer.is_running) {
+            if (currentTimer.is_paused) {
+                timerDisplay.classList.add('paused');
+            } else if (currentTimer.is_running) {
                 timerDisplay.classList.add('running');
                 
                 // Add warning/critical states based on remaining time

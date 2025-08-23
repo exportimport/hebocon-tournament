@@ -51,8 +51,14 @@ DEFAULT_DATA = {
     'timer': {
         'duration': 180,  # seconds (3 minutes default)
         'start_time': None,
+        'elapsed_time': 0,  # time already elapsed when paused
         'is_running': False,
         'is_paused': False
+    },
+    'winner_animation': {
+        'winner': None,  # 'robot1' or 'robot2'
+        'animation_state': 'normal',  # 'normal', 'winner_announced', 'celebrating'
+        'animation_timestamp': None
     },
     'last_updated': datetime.now().isoformat()
 }
@@ -630,6 +636,58 @@ def handle_timer():
         return jsonify({'success': True, 'timer': get_timer_status(data['timer'])})
     
     return jsonify(get_timer_status(data['timer']))
+
+# Winner Animation API Endpoints
+@app.route('/api/winner', methods=['POST'])
+def set_winner():
+    """Set match winner and trigger animation"""
+    data = load_data()
+    request_data = request.json or {}
+    
+    winner_robot = request_data.get('winner')  # 'robot1' or 'robot2'
+    
+    if winner_robot not in ['robot1', 'robot2']:
+        return jsonify({'success': False, 'message': 'Invalid winner. Must be robot1 or robot2'})
+    
+    # Ensure winner_animation exists
+    if 'winner_animation' not in data:
+        data['winner_animation'] = {
+            'winner': None,
+            'animation_state': 'normal',
+            'animation_timestamp': None
+        }
+    
+    # Update winner animation data
+    data['winner_animation']['winner'] = winner_robot
+    data['winner_animation']['animation_state'] = 'winner_announced'
+    data['winner_animation']['animation_timestamp'] = time.time()
+    
+    save_data(data)
+    return jsonify({
+        'success': True, 
+        'winner': winner_robot,
+        'animation_state': 'winner_announced'
+    })
+
+@app.route('/api/winner/reset', methods=['POST'])
+def reset_winner_animation():
+    """Reset winner animation state"""
+    data = load_data()
+    
+    # Ensure winner_animation exists
+    if 'winner_animation' not in data:
+        data['winner_animation'] = {
+            'winner': None,
+            'animation_state': 'normal',
+            'animation_timestamp': None
+        }
+    else:
+        data['winner_animation']['winner'] = None
+        data['winner_animation']['animation_state'] = 'normal'
+        data['winner_animation']['animation_timestamp'] = None
+    
+    save_data(data)
+    return jsonify({'success': True})
 
 def get_timer_status(timer_data):
     """Calculate current timer status"""

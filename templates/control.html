@@ -524,6 +524,43 @@
             border: 1px solid #f5c6cb;
             color: #721c24;
         }
+
+        /* Winner Controls */
+        .winner-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .winner-button {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .winner-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+        }
+
+        .winner-button.reset {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .winner-button.reset:hover {
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -537,6 +574,22 @@
         <a href="/" target="_blank">Control Panel</a> |
         <a href="/overlay" target="_blank">OBS Overlay</a> |
         <a href="/api/data" target="_blank">API Daten</a>
+    </div>
+
+    <!-- Gewinner Animation -->
+    <div class="control-panel">
+        <h2>🏆 Gewinner Animation</h2>
+        <div class="winner-controls">
+            <button class="winner-button" onclick="announceWinner('robot1')" id="winnerBtn1">
+                🏆 <span id="robot1Name">Roboter 1</span> gewinnt!
+            </button>
+            <button class="winner-button" onclick="announceWinner('robot2')" id="winnerBtn2">  
+                🏆 <span id="robot2Name">Roboter 2</span> gewinnt!
+            </button>
+            <button class="winner-button reset" onclick="resetWinnerAnimation()">
+                🔄 Animation zurücksetzen
+            </button>
+        </div>
     </div>
 
     <!-- Aktuelle Anzeige -->
@@ -1191,9 +1244,16 @@
 
         // Display aktualisieren
         function updateDisplay() {
-            document.getElementById('currentRobot1').textContent = currentData.current_match?.robot1 || 'Roboter 1';
-            document.getElementById('currentRobot2').textContent = currentData.current_match?.robot2 || 'Roboter 2';
+            const robot1Name = currentData.current_match?.robot1 || 'Roboter 1';
+            const robot2Name = currentData.current_match?.robot2 || 'Roboter 2';
+            
+            document.getElementById('currentRobot1').textContent = robot1Name;
+            document.getElementById('currentRobot2').textContent = robot2Name;
             document.getElementById('currentRound').textContent = currentData.current_match?.round || 'Runde';
+            
+            // Update winner button texts
+            document.getElementById('robot1Name').textContent = robot1Name;
+            document.getElementById('robot2Name').textContent = robot2Name;
         }
 
         // Roboter Grid rendern
@@ -1510,6 +1570,32 @@
             if (timerUpdateInterval) {
                 clearInterval(timerUpdateInterval);
                 timerUpdateInterval = null;
+            }
+        }
+
+        // Winner Animation Functions
+        async function announceWinner(winnerRobot) {
+            const result = await apiCall('/api/winner', 'POST', {
+                winner: winnerRobot
+            });
+            
+            if (result && result.success) {
+                const robotName = winnerRobot === 'robot1' 
+                    ? (currentData.current_match?.robot1 || 'Robot 1') 
+                    : (currentData.current_match?.robot2 || 'Robot 2');
+                updateStatus(`🎉 ${robotName} is the winner! Animation started.`, 'success');
+            } else {
+                updateStatus(`❌ Failed to announce winner: ${result?.message || 'Unknown error'}`, 'error');
+            }
+        }
+
+        async function resetWinnerAnimation() {
+            const result = await apiCall('/api/winner/reset', 'POST');
+            
+            if (result && result.success) {
+                updateStatus('🔄 Winner animation reset', 'success');
+            } else {
+                updateStatus('❌ Failed to reset winner animation', 'error');
             }
         }
 

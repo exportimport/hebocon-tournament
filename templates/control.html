@@ -643,6 +643,11 @@
             <h4 style="margin-bottom: 10px; color: #333;">Neuen Roboter hinzufügen:</h4>
             <input type="text" id="newRobotInput" placeholder="Roboter Name" maxlength="30">
             <button onclick="addRobot()">➕ Hinzufügen</button>
+            
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                <h4 style="margin-bottom: 10px; color: #333;">Test-Daten:</h4>
+                <button onclick="generateTestRobots()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🎲 16 Test-Roboter generieren</button>
+            </div>
         </div>
     </div>
 
@@ -1386,6 +1391,19 @@
                 updateStatus(`✅ ${name} hinzugefügt`, 'success');
             } else {
                 updateStatus(`❌ ${result?.message || 'Fehler beim Hinzufügen'}`, 'error');
+            }
+        }
+
+        // Test-Roboter generieren
+        async function generateTestRobots() {
+            if (confirm('Alle vorhandenen Roboter werden gelöscht und 16 Test-Roboter generiert. Fortfahren?')) {
+                const result = await apiCall('/api/robots/generate-test-data', 'POST');
+                if (result && result.success) {
+                    await loadData();
+                    updateStatus(`✅ ${result.message}`, 'success');
+                } else {
+                    updateStatus(`❌ ${result?.message || 'Fehler beim Generieren der Test-Daten'}`, 'error');
+                }
             }
         }
 

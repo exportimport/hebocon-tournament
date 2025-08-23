@@ -1,175 +1,35 @@
 {
-  "robots": [
-    "Wackel-Bot 3000",
-    "Chaos-Maschine",
-    "Sturz-Roboter",
-    "Mega-Wackler",
-    "Schrott-König",
-    "Bumm-Bot",
-    "Zitter-Zerstörer",
-    "Krach-Kiste",
-    "Wums-Wurm",
-    "Rüttel-Rex",
-    "Kipp-Bot",
-    "Vibro-Fighter",
-    "sfsad",
-    "324e324",
-    "234234",
-    "sdfsf"
-  ],
+  "robots": [],
   "current_match": {
-    "robot1": "Chaos-Maschine",
-    "robot2": "Wackel-Bot 3000",
-    "round": "round1"
+    "robot1": "",
+    "robot2": "",
+    "round": "Vorrunde"
   },
   "bracket": {
-    "tournament_id": "52fb4bea-eca9-4359-b6a4-55282064fea9",
-    "status": "running",
+    "tournament_id": null,
+    "status": "not_setup",
     "current_round": "round1",
-    "current_match_id": "r1_m8",
-    "matches": {
-      "r1_m1": {
-        "robot1": "Vibro-Fighter",
-        "robot2": "Sturz-Roboter",
-        "winner": null,
-        "completed": false,
-        "round": "round1"
-      },
-      "r1_m2": {
-        "robot1": "324e324",
-        "robot2": "Mega-Wackler",
-        "winner": null,
-        "completed": false,
-        "round": "round1"
-      },
-      "r1_m3": {
-        "robot1": "Zitter-Zerstörer",
-        "robot2": "Kipp-Bot",
-        "winner": null,
-        "completed": false,
-        "round": "round1"
-      },
-      "r1_m4": {
-        "robot1": "Krach-Kiste",
-        "robot2": "234234",
-        "winner": null,
-        "completed": false,
-        "round": "round1"
-      },
-      "r1_m5": {
-        "robot1": "Rüttel-Rex",
-        "robot2": "Wums-Wurm",
-        "winner": null,
-        "completed": false,
-        "round": "round1"
-      },
-      "r1_m6": {
-        "robot1": "Schrott-König",
-        "robot2": "sdfsf",
-        "winner": null,
-        "completed": false,
-        "round": "round1"
-      },
-      "r1_m7": {
-        "robot1": "sfsad",
-        "robot2": "Bumm-Bot",
-        "winner": null,
-        "completed": false,
-        "round": "round1"
-      },
-      "r1_m8": {
-        "robot1": "Chaos-Maschine",
-        "robot2": "Wackel-Bot 3000",
-        "winner": null,
-        "completed": false,
-        "round": "round1"
-      },
-      "qf_m1": {
-        "robot1": "winner_r1_m1",
-        "robot2": "winner_r1_m2",
-        "winner": null,
-        "completed": false,
-        "round": "quarterfinals"
-      },
-      "qf_m2": {
-        "robot1": "winner_r1_m3",
-        "robot2": "winner_r1_m4",
-        "winner": null,
-        "completed": false,
-        "round": "quarterfinals"
-      },
-      "qf_m3": {
-        "robot1": "winner_r1_m5",
-        "robot2": "winner_r1_m6",
-        "winner": null,
-        "completed": false,
-        "round": "quarterfinals"
-      },
-      "qf_m4": {
-        "robot1": "winner_r1_m7",
-        "robot2": "winner_r1_m8",
-        "winner": null,
-        "completed": false,
-        "round": "quarterfinals"
-      },
-      "sf_m1": {
-        "robot1": "winner_qf_m1",
-        "robot2": "winner_qf_m2",
-        "winner": null,
-        "completed": false,
-        "round": "semifinals"
-      },
-      "sf_m2": {
-        "robot1": "winner_qf_m3",
-        "robot2": "winner_qf_m4",
-        "winner": null,
-        "completed": false,
-        "round": "semifinals"
-      },
-      "final": {
-        "robot1": "winner_sf_m1",
-        "robot2": "winner_sf_m2",
-        "winner": null,
-        "completed": false,
-        "round": "finals"
-      }
-    },
-    "bracket_positions": {
-      "pos_1": "Vibro-Fighter",
-      "pos_2": "Sturz-Roboter",
-      "pos_3": "324e324",
-      "pos_4": "Mega-Wackler",
-      "pos_5": "Zitter-Zerstörer",
-      "pos_6": "Kipp-Bot",
-      "pos_7": "Krach-Kiste",
-      "pos_8": "234234",
-      "pos_9": "Rüttel-Rex",
-      "pos_10": "Wums-Wurm",
-      "pos_11": "Schrott-König",
-      "pos_12": "sdfsf",
-      "pos_13": "sfsad",
-      "pos_14": "Bumm-Bot",
-      "pos_15": "Chaos-Maschine",
-      "pos_16": "Wackel-Bot 3000"
-    }
+    "current_match_id": null,
+    "matches": {},
+    "bracket_positions": {}
   },
   "overlay_settings": {
     "display_mode": "match"
   },
-  "last_updated": "2025-08-23T19:01:03.627151",
+  "tournament_settings": {
+    "title": "HEBOCON 2025"
+  },
   "timer": {
-    "duration": 120,
+    "duration": 180,
     "start_time": null,
+    "elapsed_time": 0,
     "is_running": false,
-    "is_paused": false,
-    "elapsed_time": 0
+    "is_paused": false
   },
   "winner_animation": {
     "winner": null,
     "animation_state": "normal",
     "animation_timestamp": null
   },
-  "tournament_settings": {
-    "title": "HEBOCON 2025"
-  }
+  "last_updated": "2025-08-24T00:50:40.556538"
 }

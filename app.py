@@ -18,24 +18,11 @@ DATA_FILE = 'tournament_data.json'
 
 # Standard-Daten
 DEFAULT_DATA = {
-    'robots': [
-        'Wackel-Bot 3000',
-        'Chaos-Maschine', 
-        'Sturz-Roboter',
-        'Mega-Wackler',
-        'Schrott-König',
-        'Bumm-Bot',
-        'Zitter-Zerstörer',
-        'Krach-Kiste',
-        'Wums-Wurm',
-        'Rüttel-Rex',
-        'Kipp-Bot',
-        'Vibro-Fighter'
-    ],
+    'robots': [],
     'current_match': {
-        'robot1': 'Wackel-Bot 3000',
-        'robot2': 'Chaos-Maschine',
-        'round': 'Viertelfinale'
+        'robot1': '',
+        'robot2': '',
+        'round': 'Vorrunde'
     },
     'bracket': {
         'tournament_id': None,
@@ -332,6 +319,27 @@ def reset_data():
     """Alle Daten zurücksetzen"""
     save_data(DEFAULT_DATA.copy())
     return jsonify({'success': True, 'message': 'Daten zurückgesetzt'})
+
+@app.route('/api/robots/generate-test-data', methods=['POST'])
+def generate_test_robots():
+    """Generate 16 test robots for tournament testing"""
+    test_robots = [
+        'Wackel-Bot 3000', 'Chaos-Maschine', 'Sturz-Roboter', 'Mega-Wackler',
+        'Schrott-König', 'Bumm-Bot', 'Zitter-Zerstörer', 'Krach-Kiste',
+        'Wums-Wurm', 'Rüttel-Rex', 'Kipp-Bot', 'Vibro-Fighter',
+        'Crash-Dummy', 'Wobble-Warrior', 'Tilt-Master', 'Shake-n-Break'
+    ]
+    
+    data = load_data()
+    # Clear existing robots and add test robots
+    data['robots'] = test_robots.copy()
+    save_data(data)
+    
+    return jsonify({
+        'success': True, 
+        'message': f'{len(test_robots)} Test-Roboter generiert',
+        'robots': test_robots
+    })
 
 # Bracket API Endpoints
 @app.route('/api/bracket', methods=['GET'])

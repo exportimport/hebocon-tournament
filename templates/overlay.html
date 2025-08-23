@@ -480,6 +480,98 @@
                 opacity: 0.4;
             }
         }
+
+        /* Winner Animation Styles */
+        .winner-celebration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+            display: none;
+            z-index: 100;
+        }
+
+        .winner-celebration.active {
+            display: block;
+        }
+
+        .robot-battle.winner-mode .robot-name {
+            transition: all 1s ease;
+        }
+
+        .robot-battle.winner-mode .robot-name.loser {
+            opacity: 0.2;
+            transform: scale(0.8);
+        }
+
+        .robot-battle.winner-mode .robot-name.winner {
+            transform: scale(1.4) translateX(0);
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.8);
+            animation: winner-glow 2s infinite alternate;
+            position: relative;
+            z-index: 10;
+        }
+
+        .robot-battle.winner-mode .vs {
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .winner-banner {
+            position: absolute;
+            top: 200px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            font-size: 48px;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 4px 4px 8px rgba(0,0,0,0.8);
+            animation: banner-slide 1s ease-out forwards;
+            z-index: 15;
+            display: none;
+        }
+
+        .winner-banner.show {
+            display: block;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            animation: confetti-fall 3s linear infinite;
+            z-index: 5;
+        }
+
+        .confetti.red { background: #ff6b6b; }
+        .confetti.blue { background: #4ecdc4; }
+        .confetti.green { background: #95e1d3; }
+        .confetti.purple { background: #a8e6cf; }
+
+        @keyframes winner-glow {
+            0% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+            100% { box-shadow: 0 0 60px rgba(255, 215, 0, 1); }
+        }
+
+        @keyframes banner-slide {
+            0% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+            100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        @keyframes confetti-fall {
+            0% { 
+                transform: translateY(-100px) rotate(0deg); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(1200px) rotate(360deg); 
+                opacity: 0; 
+            }
+        }
     </style>
 </head>
 <body>
@@ -540,6 +632,10 @@
             <div class="timer-label">TIME</div>
             <div id="timerValue">03:00</div>
         </div>
+
+        <!-- Winner Animation Elements -->
+        <div class="winner-celebration" id="winnerCelebration"></div>
+        <div class="winner-banner" id="winnerBanner">🏆 WINNER 🏆</div>
     </div>
 
     <script>
@@ -547,6 +643,8 @@
         let currentBracket = {};
         let displayMode = 'match'; // 'match' or 'bracket'
         let currentTimer = {};
+        let currentWinnerAnimation = {};
+        let animationTimeout = null;
 
         // Daten vom Server laden
         async function loadData() {
@@ -575,6 +673,12 @@
                     // Update Zeit merken
                     lastUpdateTime = new Date();
                     updateStatusIndicator('LIVE');
+                }
+
+                // Handle winner animation
+                if (data && data.winner_animation) {
+                    currentWinnerAnimation = data.winner_animation;
+                    updateWinnerAnimation();
                 }
                 
                 // Update bracket data
@@ -830,6 +934,126 @@
                 });
             }
         });
+
+        // Winner Animation Functions
+        function updateWinnerAnimation() {
+            if (!currentWinnerAnimation || currentWinnerAnimation.animation_state === 'normal') {
+                resetWinnerDisplay();
+                return;
+            }
+
+            if (currentWinnerAnimation.animation_state === 'winner_announced' && currentWinnerAnimation.winner) {
+                startWinnerAnimation(currentWinnerAnimation.winner);
+            }
+        }
+
+        function startWinnerAnimation(winner) {
+            const robotBattle = document.querySelector('.robot-battle');
+            const robot1 = document.getElementById('robot1');
+            const robot2 = document.getElementById('robot2');
+            const celebration = document.getElementById('winnerCelebration');
+            const banner = document.getElementById('winnerBanner');
+
+            // Clear any existing animation timeout
+            if (animationTimeout) {
+                clearTimeout(animationTimeout);
+            }
+
+            // Phase 1: Fade-out loser and activate winner mode (1s)
+            robotBattle.classList.add('winner-mode');
+            
+            if (winner === 'robot1') {
+                robot1.classList.add('winner');
+                robot2.classList.add('loser');
+            } else {
+                robot2.classList.add('winner');
+                robot1.classList.add('loser');
+            }
+
+            // Phase 2: Show celebration background and banner (2s after start)
+            setTimeout(() => {
+                celebration.classList.add('active');
+                banner.classList.add('show');
+                createConfetti();
+            }, 1000);
+
+            // Auto-reset after 8 seconds
+            animationTimeout = setTimeout(() => {
+                resetWinnerAnimationState();
+            }, 8000);
+        }
+
+        function resetWinnerDisplay() {
+            const robotBattle = document.querySelector('.robot-battle');
+            const robot1 = document.getElementById('robot1');
+            const robot2 = document.getElementById('robot2');
+            const celebration = document.getElementById('winnerCelebration');
+            const banner = document.getElementById('winnerBanner');
+
+            // Clear animation timeout
+            if (animationTimeout) {
+                clearTimeout(animationTimeout);
+                animationTimeout = null;
+            }
+
+            // Remove all winner classes
+            robotBattle.classList.remove('winner-mode');
+            robot1.classList.remove('winner', 'loser');
+            robot2.classList.remove('winner', 'loser');
+            celebration.classList.remove('active');
+            banner.classList.remove('show');
+
+            // Clear confetti
+            clearConfetti();
+        }
+
+        function createConfetti() {
+            const celebration = document.getElementById('winnerCelebration');
+            const colors = ['', 'red', 'blue', 'green', 'purple'];
+            
+            // Create 50 confetti particles
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti ' + colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                celebration.appendChild(confetti);
+            }
+        }
+
+        function clearConfetti() {
+            const celebration = document.getElementById('winnerCelebration');
+            const confettiElements = celebration.querySelectorAll('.confetti');
+            confettiElements.forEach(confetti => confetti.remove());
+        }
+
+        async function resetWinnerAnimationState() {
+            // Call API to reset animation state
+            try {
+                const response = await fetch('/api/winner/reset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (response.ok) {
+                    // Reset display immediately
+                    resetWinnerDisplay();
+                    // Update current state
+                    currentWinnerAnimation = {
+                        winner: null,
+                        animation_state: 'normal',
+                        animation_timestamp: null
+                    };
+                }
+            } catch (error) {
+                console.error('Error resetting winner animation:', error);
+                // Reset display anyway to avoid stuck animation
+                resetWinnerDisplay();
+            }
+        }
 
         // Initialisierung
         document.addEventListener('DOMContentLoaded', function() {

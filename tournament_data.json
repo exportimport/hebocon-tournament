@@ -12,82 +12,81 @@
     "Rüttel-Rex",
     "Kipp-Bot",
     "Vibro-Fighter",
-    "123123",
-    "1111",
-    "4324432",
-    "232",
-    "234324"
+    "sfsad",
+    "324e324",
+    "234234",
+    "sdfsf"
   ],
   "current_match": {
-    "robot1": "Zitter-Zerstörer",
-    "robot2": "232",
+    "robot1": "Chaos-Maschine",
+    "robot2": "Wackel-Bot 3000",
     "round": "round1"
   },
   "bracket": {
-    "tournament_id": "e7b8c4b7-937b-4412-b6a3-afbb3bed7dcc",
-    "status": "setup",
+    "tournament_id": "52fb4bea-eca9-4359-b6a4-55282064fea9",
+    "status": "running",
     "current_round": "round1",
     "current_match_id": "r1_m8",
     "matches": {
       "r1_m1": {
-        "robot1": "Mega-Wackler",
-        "robot2": "Schrott-König",
-        "winner": "Schrott-König",
-        "completed": true,
+        "robot1": "Vibro-Fighter",
+        "robot2": "Sturz-Roboter",
+        "winner": null,
+        "completed": false,
         "round": "round1"
       },
       "r1_m2": {
-        "robot1": "Vibro-Fighter",
-        "robot2": "Wackel-Bot 3000",
-        "winner": "Vibro-Fighter",
-        "completed": true,
+        "robot1": "324e324",
+        "robot2": "Mega-Wackler",
+        "winner": null,
+        "completed": false,
         "round": "round1"
       },
       "r1_m3": {
-        "robot1": "Kipp-Bot",
-        "robot2": "1111",
+        "robot1": "Zitter-Zerstörer",
+        "robot2": "Kipp-Bot",
         "winner": null,
         "completed": false,
         "round": "round1"
       },
       "r1_m4": {
-        "robot1": "123123",
-        "robot2": "4324432",
+        "robot1": "Krach-Kiste",
+        "robot2": "234234",
         "winner": null,
         "completed": false,
         "round": "round1"
       },
       "r1_m5": {
-        "robot1": "Sturz-Roboter",
-        "robot2": "Chaos-Maschine",
-        "winner": null,
-        "completed": false,
-        "round": "round1"
-      },
-      "r1_m6": {
-        "robot1": "Bumm-Bot",
+        "robot1": "Rüttel-Rex",
         "robot2": "Wums-Wurm",
         "winner": null,
         "completed": false,
         "round": "round1"
       },
+      "r1_m6": {
+        "robot1": "Schrott-König",
+        "robot2": "sdfsf",
+        "winner": null,
+        "completed": false,
+        "round": "round1"
+      },
       "r1_m7": {
-        "robot1": "Krach-Kiste",
-        "robot2": "Rüttel-Rex",
+        "robot1": "sfsad",
+        "robot2": "Bumm-Bot",
         "winner": null,
         "completed": false,
         "round": "round1"
       },
       "r1_m8": {
-        "robot1": "Zitter-Zerstörer",
-        "robot2": "232",
+        "robot1": "Chaos-Maschine",
+        "robot2": "Wackel-Bot 3000",
         "winner": null,
         "completed": false,
         "round": "round1"
       },
       "qf_m1": {
-        "robot1": "Schrott-König",
-        "robot2": "Vibro-Fighter",
+        "robot1": "winner_r1_m1",
+        "robot2": "winner_r1_m2",
         "winner": null,
         "completed": false,
         "round": "quarterfinals"
@@ -136,26 +135,38 @@
       }
     },
     "bracket_positions": {
-      "pos_1": "Mega-Wackler",
-      "pos_2": "Schrott-König",
-      "pos_3": "Vibro-Fighter",
-      "pos_4": "Wackel-Bot 3000",
-      "pos_5": "Kipp-Bot",
-      "pos_6": "1111",
-      "pos_7": "123123",
-      "pos_8": "4324432",
-      "pos_9": "Sturz-Roboter",
-      "pos_10": "Chaos-Maschine",
-      "pos_11": "Bumm-Bot",
-      "pos_12": "Wums-Wurm",
-      "pos_13": "Krach-Kiste",
-      "pos_14": "Rüttel-Rex",
-      "pos_15": "Zitter-Zerstörer",
-      "pos_16": "232"
+      "pos_1": "Vibro-Fighter",
+      "pos_2": "Sturz-Roboter",
+      "pos_3": "324e324",
+      "pos_4": "Mega-Wackler",
+      "pos_5": "Zitter-Zerstörer",
+      "pos_6": "Kipp-Bot",
+      "pos_7": "Krach-Kiste",
+      "pos_8": "234234",
+      "pos_9": "Rüttel-Rex",
+      "pos_10": "Wums-Wurm",
+      "pos_11": "Schrott-König",
+      "pos_12": "sdfsf",
+      "pos_13": "sfsad",
+      "pos_14": "Bumm-Bot",
+      "pos_15": "Chaos-Maschine",
+      "pos_16": "Wackel-Bot 3000"
     }
   },
   "overlay_settings": {
-    "display_mode": "bracket"
+    "display_mode": "match"
   },
-  "last_updated": "2025-08-20T00:33:45.240346"
+  "last_updated": "2025-08-23T18:55:00.418226",
+  "timer": {
+    "duration": 120,
+    "start_time": 1755967004.4019666,
+    "is_running": true,
+    "is_paused": false,
+    "elapsed_time": 0
+  },
+  "winner_animation": {
+    "winner": "robot1",
+    "animation_state": "winner_announced",
+    "animation_timestamp": 1755968100.4182208
+  }
 }

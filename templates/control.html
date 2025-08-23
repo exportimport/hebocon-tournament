@@ -1265,9 +1265,9 @@
             document.getElementById('robot1Name').textContent = robot1Name;
             document.getElementById('robot2Name').textContent = robot2Name;
             
-            // Update tournament title input
+            // Update tournament title input only if not currently focused (being edited)
             const titleInput = document.getElementById('tournamentTitleInput');
-            if (currentData.tournament_settings?.title && titleInput) {
+            if (currentData.tournament_settings?.title && titleInput && document.activeElement !== titleInput) {
                 titleInput.value = currentData.tournament_settings.title;
             }
         }

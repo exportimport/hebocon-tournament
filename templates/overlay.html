@@ -635,7 +635,7 @@
 
         <!-- Winner Animation Elements -->
         <div class="winner-celebration" id="winnerCelebration"></div>
-        <div class="winner-banner" id="winnerBanner">🏆 CHAMPION 🏆</div>
+        <div class="winner-banner" id="winnerBanner">🏆 WINNER 🏆</div>
     </div>
 
     <script>
@@ -979,7 +979,7 @@
 
             // Auto-reset after 8 seconds
             animationTimeout = setTimeout(() => {
-                resetWinnerDisplay();
+                resetWinnerAnimationState();
             }, 8000);
         }
 
@@ -1026,6 +1026,33 @@
             const celebration = document.getElementById('winnerCelebration');
             const confettiElements = celebration.querySelectorAll('.confetti');
             confettiElements.forEach(confetti => confetti.remove());
+        }
+
+        async function resetWinnerAnimationState() {
+            // Call API to reset animation state
+            try {
+                const response = await fetch('/api/winner/reset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (response.ok) {
+                    // Reset display immediately
+                    resetWinnerDisplay();
+                    // Update current state
+                    currentWinnerAnimation = {
+                        winner: null,
+                        animation_state: 'normal',
+                        animation_timestamp: null
+                    };
+                }
+            } catch (error) {
+                console.error('Error resetting winner animation:', error);
+                // Reset display anyway to avoid stuck animation
+                resetWinnerDisplay();
+            }
         }
 
         // Initialisierung

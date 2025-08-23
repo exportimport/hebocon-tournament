@@ -156,7 +156,7 @@
   "overlay_settings": {
     "display_mode": "match"
   },
-  "last_updated": "2025-08-23T18:51:46.510760",
+  "last_updated": "2025-08-23T18:55:00.418226",
   "timer": {
     "duration": 120,
     "start_time": 1755967004.4019666,
@@ -165,8 +165,8 @@
     "elapsed_time": 0
   },
   "winner_animation": {
-    "winner": "robot2",
+    "winner": "robot1",
     "animation_state": "winner_announced",
-    "animation_timestamp": 1755967906.5107589
+    "animation_timestamp": 1755968100.4182208
   }
 }

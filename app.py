@@ -261,7 +261,24 @@ def overlay():
 @app.route('/api/data')
 def get_data():
     """Aktuelle Daten als JSON"""
-    return jsonify(load_data())
+    data = load_data()
+    
+    # Auto-reset winner animation after 8 seconds
+    if ('winner_animation' in data and 
+        data['winner_animation']['animation_state'] == 'winner_announced' and
+        data['winner_animation']['animation_timestamp']):
+        
+        current_time = time.time()
+        animation_time = data['winner_animation']['animation_timestamp']
+        
+        # If more than 8 seconds have passed, reset the animation
+        if current_time - animation_time >= 8:
+            data['winner_animation']['winner'] = None
+            data['winner_animation']['animation_state'] = 'normal'
+            data['winner_animation']['animation_timestamp'] = None
+            save_data(data)
+    
+    return jsonify(data)
 
 @app.route('/api/robots', methods=['GET', 'POST'])
 def handle_robots():

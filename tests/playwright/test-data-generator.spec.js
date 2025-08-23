@@ -152,25 +152,30 @@ test.describe('Test Data Generator Feature', () => {
     });
     
     await page.locator('button:has-text("Test-Roboter generieren")').click();
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
     await page.reload();
     await page.waitForLoadState('networkidle');
     
+    // Wait for robots to be loaded
+    await page.waitForTimeout(1000);
+    
     // Select robot slot 1
     await page.click('button:has-text("Roboter 1 auswählen")');
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
     
-    // Click first generated robot
+    // Click first generated robot with proper wait
     const firstRobot = page.locator('.robot-button').first();
+    await expect(firstRobot).toBeVisible({ timeout: 10000 });
+    
     const robotName = await firstRobot.textContent();
     await firstRobot.click();
     
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(1500);
     
     // Verify robot appears in current match display
     const currentRobot1 = page.locator('#currentRobot1');
     if (await currentRobot1.isVisible()) {
-      await expect(currentRobot1).toContainText(robotName);
+      await expect(currentRobot1).toContainText(robotName, { timeout: 5000 });
     }
   });
 

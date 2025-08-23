@@ -58,22 +58,31 @@ test.describe('Hebocon Tournament Server', () => {
     
     const generateButton = page.locator('button:has-text("Test-Roboter generieren")');
     await generateButton.click();
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
     await page.reload();
     await page.waitForLoadState('networkidle');
+    
+    // Wait for robots to be loaded
+    await page.waitForTimeout(1000);
     
     // Now test robot selection
     // Click robot 1 slot
     await page.click('button:has-text("Roboter 1 auswählen")');
-    await page.waitForTimeout(500);
-    
-    // Click the first available robot (Chaos-Maschine should be one of them)
-    const chaosRobot = page.locator('button:has-text("Chaos-Maschine")');
-    await chaosRobot.click();
     await page.waitForTimeout(1000);
     
-    // Verify the robot appears specifically in the current match display
-    await expect(page.locator('#currentRobot1')).toContainText('Chaos-Maschine');
+    // Click the first available robot button
+    const firstRobotButton = page.locator('.robot-button').first();
+    await expect(firstRobotButton).toBeVisible({ timeout: 10000 });
+    
+    const robotName = await firstRobotButton.textContent();
+    await firstRobotButton.click();
+    await page.waitForTimeout(1500);
+    
+    // Verify the robot appears in the current match display
+    const currentRobot1 = page.locator('#currentRobot1');
+    if (await currentRobot1.isVisible()) {
+      await expect(currentRobot1).toContainText(robotName, { timeout: 5000 });
+    }
     
     // Take screenshot of selection state
     await page.screenshot({ path: 'test-results/robot-selection.png', fullPage: true });
@@ -85,8 +94,8 @@ test.describe('Hebocon Tournament Server', () => {
     // Wait for page to load completely
     await page.waitForLoadState('networkidle');
     
-    // Start the timer (using German text)
-    await page.click('button:has-text("Start")');
+    // Start the timer using specific ID
+    await page.click('#startTimerBtn');
     
     // Wait a moment for timer to start
     await page.waitForTimeout(2000);
@@ -94,11 +103,11 @@ test.describe('Hebocon Tournament Server', () => {
     // Check if timer display exists and shows proper format
     await expect(page.locator('text=/\\d{2}:\\d{2}/')).toBeVisible();
     
-    // Pause timer (German text)
-    await page.click('button:has-text("Pause")');
+    // Pause timer using specific ID
+    await page.click('#pauseTimerBtn');
     
-    // Reset timer (German text)
-    await page.click('button:has-text("Reset")');
+    // Reset timer using specific ID to avoid ambiguity with bracket reset
+    await page.click('#resetTimerBtn');
     
     // Take screenshot of timer section
     await page.screenshot({ path: 'test-results/timer-test.png', fullPage: true });

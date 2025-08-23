@@ -212,6 +212,99 @@
             background: #c82333 !important;
         }
 
+        .timer-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .timer-display {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px 20px;
+            font-size: 2em;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .timer-display.running {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+            animation: timer-pulse 1s infinite;
+        }
+
+        .timer-display.warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .timer-display.critical {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+            animation: timer-blink 0.5s infinite;
+        }
+
+        .timer-input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .timer-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .timer-button:hover {
+            background: #0056b3;
+        }
+
+        .timer-button.start {
+            background: #28a745;
+        }
+
+        .timer-button.start:hover {
+            background: #1e7e34;
+        }
+
+        .timer-button.stop {
+            background: #dc3545;
+        }
+
+        .timer-button.stop:hover {
+            background: #c82333;
+        }
+
+        @keyframes timer-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes timer-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
         .round-controls {
             display: flex;
             gap: 10px;
@@ -541,6 +634,31 @@
         </div>
     </div>
 
+    <!-- Timer Control -->
+    <div class="control-panel">
+        <h2>⏱️ Kampf Timer</h2>
+        <div class="current-match" style="background: linear-gradient(135deg, #6f42c1 0%, #5a2d8c 100%);">
+            <div id="timerDisplayPanel" class="timer-display">03:00</div>
+            <p style="margin: 10px 0 0 0; font-size: 0.9em; opacity: 0.9;">Zeit für den aktuellen Kampf</p>
+        </div>
+        <div class="timer-controls">
+            <div>
+                <label for="timerMinutes" style="font-size: 14px; font-weight: bold;">Minuten:</label>
+                <input type="number" id="timerMinutes" class="timer-input" value="3" min="0" max="59">
+            </div>
+            <div>
+                <label for="timerSeconds" style="font-size: 14px; font-weight: bold;">Sekunden:</label>
+                <input type="number" id="timerSeconds" class="timer-input" value="0" min="0" max="59">
+            </div>
+            <button class="timer-button" onclick="setTimerDuration()">⚙️ Zeit setzen</button>
+        </div>
+        <div class="actions">
+            <button class="timer-button start" onclick="startTimer()" id="startTimerBtn">▶️ Start</button>
+            <button class="timer-button stop" onclick="stopTimer()" id="stopTimerBtn">⏹️ Stop</button>
+            <button class="timer-button" onclick="resetTimer()" id="resetTimerBtn">🔄 Reset</button>
+        </div>
+    </div>
+
     <!-- Aktionen -->
     <div class="control-panel">
         <h2>⚙️ Aktionen</h2>
@@ -555,6 +673,8 @@
         let currentData = {};
         let currentBracket = {};
         let selectedBracketPosition = null;
+        let currentTimer = {};
+        let timerUpdateInterval = null;
 
         // API Aufrufe
         async function apiCall(endpoint, method = 'GET', data = null) {
@@ -581,7 +701,10 @@
 
         // Daten laden
         async function loadData() {
-            const data = await apiCall('/api/data');
+            const [data, timer] = await Promise.all([
+                apiCall('/api/data'),
+                apiCall('/api/timer')
+            ]);
             if (data) {
                 currentData = data;
                 updateDisplay();
@@ -589,6 +712,10 @@
                 await loadBracket();
                 await loadOverlayMode();
                 updateStatus('✅ Daten geladen', 'success');
+            }
+            if (timer) {
+                currentTimer = timer;
+                updateTimerUI();
             }
         }
 
@@ -1249,6 +1376,110 @@
         document.getElementById('customRoundInput').addEventListener('keypress', function(event) {
             if (event.key === 'Enter') setCustomRound();
         });
+
+        // Timer functions
+        function updateTimerUI() {
+            const display = document.getElementById('timerDisplayPanel');
+            if (!display) return;
+            
+            display.textContent = currentTimer.remaining_formatted || '00:00';
+            
+            // Remove all status classes
+            display.classList.remove('running', 'warning', 'critical');
+            
+            // Add appropriate status class
+            if (currentTimer.is_running) {
+                display.classList.add('running');
+                
+                if (currentTimer.remaining <= 30) {
+                    display.classList.add('critical');
+                } else if (currentTimer.remaining <= 60) {
+                    display.classList.add('warning');
+                }
+            }
+        }
+
+        async function setTimerDuration() {
+            const minutes = parseInt(document.getElementById('timerMinutes').value) || 0;
+            const seconds = parseInt(document.getElementById('timerSeconds').value) || 0;
+            const totalSeconds = minutes * 60 + seconds;
+            
+            if (totalSeconds <= 0) {
+                updateStatus('❌ Timer duration must be greater than 0', 'error');
+                return;
+            }
+            
+            const result = await apiCall('/api/timer', 'POST', {
+                duration: totalSeconds
+            });
+            
+            if (result && result.success) {
+                currentTimer = result.timer;
+                updateTimerUI();
+                updateStatus(`⏱️ Timer set to ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`, 'success');
+            }
+        }
+
+        async function startTimer() {
+            const result = await apiCall('/api/timer', 'POST', {
+                action: 'start'
+            });
+            
+            if (result && result.success) {
+                currentTimer = result.timer;
+                updateTimerUI();
+                updateStatus('▶️ Timer started', 'success');
+                startTimerUpdates();
+            }
+        }
+
+        async function stopTimer() {
+            const result = await apiCall('/api/timer', 'POST', {
+                action: 'stop'
+            });
+            
+            if (result && result.success) {
+                currentTimer = result.timer;
+                updateTimerUI();
+                updateStatus('⏹️ Timer stopped', 'info');
+                stopTimerUpdates();
+            }
+        }
+
+        async function resetTimer() {
+            const result = await apiCall('/api/timer', 'POST', {
+                action: 'reset'
+            });
+            
+            if (result && result.success) {
+                currentTimer = result.timer;
+                updateTimerUI();
+                updateStatus('🔄 Timer reset', 'info');
+                stopTimerUpdates();
+            }
+        }
+
+        function startTimerUpdates() {
+            stopTimerUpdates(); // Clear any existing interval
+            timerUpdateInterval = setInterval(async () => {
+                const timer = await apiCall('/api/timer');
+                if (timer) {
+                    currentTimer = timer;
+                    updateTimerUI();
+                    
+                    if (!timer.is_running) {
+                        stopTimerUpdates();
+                    }
+                }
+            }, 1000);
+        }
+
+        function stopTimerUpdates() {
+            if (timerUpdateInterval) {
+                clearInterval(timerUpdateInterval);
+                timerUpdateInterval = null;
+            }
+        }
 
         // Auto-refresh alle 5 Sekunden
         setInterval(loadData, 5000);

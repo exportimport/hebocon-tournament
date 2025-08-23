@@ -386,6 +386,84 @@
         .path-indicator.visible {
             display: block;
         }
+
+        /* Timer Display */
+        .timer-display {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(30, 30, 30, 0.9) 100%);
+            color: #ffffff;
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 2px solid #ff6b35;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            font-family: 'Courier New', monospace;
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            min-width: 120px;
+            text-align: center;
+            display: none;
+        }
+
+        .timer-display.visible {
+            display: block;
+        }
+
+        .timer-display.running {
+            border-color: #28a745;
+            color: #90EE90;
+            animation: timer-pulse 1s infinite;
+        }
+
+        .timer-display.warning {
+            border-color: #ffc107;
+            color: #ffc107;
+            animation: timer-warning 0.5s infinite;
+        }
+
+        .timer-display.critical {
+            border-color: #dc3545;
+            color: #ff6b6b;
+            animation: timer-critical 0.25s infinite;
+        }
+
+        @keyframes timer-pulse {
+            0%, 100% {
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 8px 32px rgba(40, 167, 69, 0.4);
+            }
+        }
+
+        @keyframes timer-warning {
+            0%, 100% {
+                box-shadow: 0 8px 32px rgba(255, 193, 7, 0.6);
+            }
+            50% {
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        @keyframes timer-critical {
+            0%, 100% {
+                box-shadow: 0 8px 32px rgba(220, 53, 69, 0.8);
+            }
+            50% {
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        .timer-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+            font-weight: normal;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
@@ -440,12 +518,19 @@
                 Path to Victory: Round 1 → Quarterfinals → Semifinals → Finals
             </div>
         </div>
+
+        <!-- Timer Display -->
+        <div class="timer-display" id="timerDisplay">
+            <div class="timer-label">TIME</div>
+            <div id="timerValue">03:00</div>
+        </div>
     </div>
 
     <script>
         let lastUpdateTime = null;
         let currentBracket = {};
         let displayMode = 'match'; // 'match' or 'bracket'
+        let currentTimer = {};
 
         // Daten vom Server laden
         async function loadData() {
@@ -453,15 +538,17 @@
                 document.getElementById('loadingIndicator').classList.add('visible');
                 document.getElementById('errorState').classList.remove('visible');
                 
-                const [dataResponse, bracketResponse, overlayModeResponse] = await Promise.all([
+                const [dataResponse, bracketResponse, overlayModeResponse, timerResponse] = await Promise.all([
                     fetch('/api/data'),
                     fetch('/api/bracket'),
-                    fetch('/api/overlay/mode')
+                    fetch('/api/overlay/mode'),
+                    fetch('/api/timer')
                 ]);
                 
                 const data = await dataResponse.json();
                 const bracket = await bracketResponse.json();
                 const overlayMode = await overlayModeResponse.json();
+                const timer = await timerResponse.json();
                 
                 if (data && data.current_match) {
                     // Roboternamen aktualisieren
@@ -485,6 +572,12 @@
                     updateDisplayMode();
                 } else if (displayMode === 'bracket') {
                     renderBracketOverlay();
+                }
+                
+                // Update timer
+                if (timer) {
+                    currentTimer = timer;
+                    updateTimerDisplay();
                 }
                 
                 document.getElementById('loadingIndicator').classList.remove('visible');
@@ -631,6 +724,36 @@
             statusEl.textContent = statusMessages[status] || statusMessages['not_setup'];
         }
 
+        // Update timer display
+        function updateTimerDisplay() {
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timerValue = document.getElementById('timerValue');
+            
+            if (!currentTimer || !currentTimer.remaining_formatted) {
+                timerDisplay.classList.remove('visible');
+                return;
+            }
+            
+            // Show timer
+            timerDisplay.classList.add('visible');
+            timerValue.textContent = currentTimer.remaining_formatted;
+            
+            // Remove all status classes
+            timerDisplay.classList.remove('running', 'warning', 'critical');
+            
+            // Add appropriate status class
+            if (currentTimer.is_running) {
+                timerDisplay.classList.add('running');
+                
+                // Add warning/critical states based on remaining time
+                if (currentTimer.remaining <= 30) {
+                    timerDisplay.classList.add('critical');
+                } else if (currentTimer.remaining <= 60) {
+                    timerDisplay.classList.add('warning');
+                }
+            }
+        }
+
         // Status Indicator aktualisieren
         function updateStatusIndicator(status) {
             const indicator = document.getElementById('statusIndicator');
@@ -647,9 +770,9 @@
             }
         }
 
-        // Automatisches Update alle 2 Sekunden
+        // Automatisches Update alle 2 Sekunden (1 Sekunde für Timer)
         function startAutoUpdate() {
-            setInterval(loadData, 2000);
+            setInterval(loadData, 1000);
         }
 
         // Connection Status prüfen

@@ -9,6 +9,7 @@ import json
 import os
 import uuid
 from datetime import datetime
+import time
 
 app = Flask(__name__)
 
@@ -46,6 +47,12 @@ DEFAULT_DATA = {
     },
     'overlay_settings': {
         'display_mode': 'match'  # 'match' or 'bracket'
+    },
+    'timer': {
+        'duration': 180,  # seconds (3 minutes default)
+        'start_time': None,
+        'is_running': False,
+        'is_paused': False
     },
     'last_updated': datetime.now().isoformat()
 }
@@ -561,6 +568,75 @@ def reset_bracket():
     }
     save_data(data)
     return jsonify({'success': True, 'message': 'Tournament bracket reset'})
+
+# Timer API Endpoints
+@app.route('/api/timer', methods=['GET', 'POST'])
+def handle_timer():
+    """Get/set timer state"""
+    data = load_data()
+    
+    if 'timer' not in data:
+        data['timer'] = {
+            'duration': 180,
+            'start_time': None,
+            'is_running': False,
+            'is_paused': False
+        }
+    
+    if request.method == 'POST':
+        request_data = request.json or {}
+        
+        if 'duration' in request_data:
+            data['timer']['duration'] = int(request_data['duration'])
+        
+        if 'action' in request_data:
+            action = request_data['action']
+            
+            if action == 'start':
+                data['timer']['start_time'] = time.time()
+                data['timer']['is_running'] = True
+                data['timer']['is_paused'] = False
+            elif action == 'stop':
+                data['timer']['start_time'] = None
+                data['timer']['is_running'] = False
+                data['timer']['is_paused'] = False
+            elif action == 'pause':
+                data['timer']['is_paused'] = True
+                data['timer']['is_running'] = False
+            elif action == 'reset':
+                data['timer']['start_time'] = None
+                data['timer']['is_running'] = False
+                data['timer']['is_paused'] = False
+        
+        save_data(data)
+        return jsonify({'success': True, 'timer': get_timer_status(data['timer'])})
+    
+    return jsonify(get_timer_status(data['timer']))
+
+def get_timer_status(timer_data):
+    """Calculate current timer status"""
+    current_time = time.time()
+    
+    if timer_data['is_running'] and timer_data['start_time']:
+        elapsed = current_time - timer_data['start_time']
+        remaining = max(0, timer_data['duration'] - elapsed)
+    elif timer_data['is_paused'] and timer_data['start_time']:
+        elapsed = current_time - timer_data['start_time'] 
+        remaining = max(0, timer_data['duration'] - elapsed)
+    else:
+        remaining = timer_data['duration']
+    
+    minutes = int(remaining // 60)
+    seconds = int(remaining % 60)
+    
+    return {
+        'duration': timer_data['duration'],
+        'remaining': remaining,
+        'remaining_formatted': f"{minutes:02d}:{seconds:02d}",
+        'is_running': timer_data['is_running'],
+        'is_paused': timer_data['is_paused'],
+        'start_time': timer_data['start_time']
+    }
 
 if __name__ == '__main__':
     # Template-Ordner erstellen falls nicht vorhanden

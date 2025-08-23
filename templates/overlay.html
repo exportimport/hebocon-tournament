@@ -404,8 +404,8 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             min-width: 120px;
             text-align: center;
-            z-index: 9999;
-            display: block !important;
+            z-index: 1000;
+            display: block;
         }
 
         .timer-display.visible {
@@ -540,11 +540,6 @@
             <div class="timer-label">TIME</div>
             <div id="timerValue">03:00</div>
         </div>
-    </div>
-
-    <!-- Debug Timer - Outside container -->
-    <div id="debugTimer" style="position: fixed; top: 20px; right: 20px; background: red; color: white; padding: 10px; z-index: 99999; font-size: 24px; border: 3px solid yellow;">
-        DEBUG TIMER: 99:99
     </div>
 
     <script>
@@ -840,21 +835,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🤖 Hebocon Overlay gestartet');
             
-            // Force show timer immediately with debug
+            // Ensure timer is visible
             const timerDisplay = document.getElementById('timerDisplay');
             if (timerDisplay) {
                 timerDisplay.style.display = 'block';
-                timerDisplay.style.position = 'fixed';
-                timerDisplay.style.bottom = '40px';
-                timerDisplay.style.right = '40px';
-                timerDisplay.style.zIndex = '9999';
-                timerDisplay.style.backgroundColor = 'red'; // Debug: make it obvious
-                timerDisplay.style.color = 'white';
-                timerDisplay.style.padding = '20px';
-                timerDisplay.style.border = '3px solid yellow'; // Debug: bright border
-                console.log('Timer element found and styled:', timerDisplay);
+                console.log('Timer element initialized successfully');
             } else {
-                console.error('Timer element NOT found!');
+                console.error('Timer element not found');
             }
             
             loadData();

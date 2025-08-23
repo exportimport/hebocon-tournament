@@ -47,19 +47,29 @@ test.describe('Hebocon Tournament Server', () => {
     expect(data).toHaveProperty('tournament_settings');
   });
 
-  test('robot selection works', async ({ page }) => {
+  test('robot selection works with test data', async ({ page }) => {
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     
-    // Click robot 1 slot (using the exact text from the German interface)
+    // Generate test robots first since there are no default robots
+    page.on('dialog', async dialog => {
+      await dialog.accept();
+    });
+    
+    const generateButton = page.locator('button:has-text("Test-Roboter generieren")');
+    await generateButton.click();
+    await page.waitForTimeout(2000);
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+    
+    // Now test robot selection
+    // Click robot 1 slot
     await page.click('button:has-text("Roboter 1 auswählen")');
-    
-    // Wait for UI update
     await page.waitForTimeout(500);
     
-    // Click a robot from the library
-    await page.click('button:has-text("Chaos-Maschine")');
-    
-    // Wait for selection to be processed
+    // Click the first available robot (Chaos-Maschine should be one of them)
+    const chaosRobot = page.locator('button:has-text("Chaos-Maschine")');
+    await chaosRobot.click();
     await page.waitForTimeout(1000);
     
     // Verify the robot appears specifically in the current match display

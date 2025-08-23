@@ -62,8 +62,8 @@ test.describe('Hebocon Tournament Server', () => {
     // Wait for selection to be processed
     await page.waitForTimeout(1000);
     
-    // Verify the robot appears in the current match display
-    await expect(page.locator('text=Chaos-Maschine')).toBeVisible();
+    // Verify the robot appears specifically in the current match display
+    await expect(page.locator('#currentRobot1')).toContainText('Chaos-Maschine');
     
     // Take screenshot of selection state
     await page.screenshot({ path: 'test-results/robot-selection.png', fullPage: true });
@@ -82,8 +82,7 @@ test.describe('Hebocon Tournament Server', () => {
     await page.waitForTimeout(2000);
     
     // Check if timer display exists and shows proper format
-    const timerDisplay = page.locator('.timer-display, text=/\\d{2}:\\d{2}/');
-    await expect(timerDisplay.first()).toBeVisible();
+    await expect(page.locator('text=/\\d{2}:\\d{2}/')).toBeVisible();
     
     // Pause timer (German text)
     await page.click('button:has-text("Pause")');

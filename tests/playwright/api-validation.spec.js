@@ -34,6 +34,10 @@ test.describe('API Validation', () => {
   });
 
   test('robot management API functions', async ({ request }) => {
+    // Reset data first to ensure clean state
+    const resetResponse = await request.post('/api/reset');
+    expect(resetResponse.ok()).toBeTruthy();
+    
     // Add a robot
     const addResponse = await request.post('/api/robots', {
       data: { name: 'API-Test-Robot' }

@@ -170,13 +170,9 @@ test.describe('Test Data Generator Feature', () => {
     const robotName = await firstRobot.textContent();
     await firstRobot.click();
     
-    await page.waitForTimeout(1500);
-    
-    // Verify robot appears in current match display
+    // Wait for the robot to appear in current match display (robust timing)
     const currentRobot1 = page.locator('#currentRobot1');
-    if (await currentRobot1.isVisible()) {
-      await expect(currentRobot1).toContainText(robotName, { timeout: 5000 });
-    }
+    await expect(currentRobot1).toContainText(robotName, { timeout: 10000 });
   });
 
   test('multiple generations replace previous robots', async ({ page }) => {

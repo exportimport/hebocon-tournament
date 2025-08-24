@@ -76,13 +76,10 @@ test.describe('Hebocon Tournament Server', () => {
     
     const robotName = await firstRobotButton.textContent();
     await firstRobotButton.click();
-    await page.waitForTimeout(1500);
     
-    // Verify the robot appears in the current match display
+    // Wait for the robot to appear in current match display (robust timing)
     const currentRobot1 = page.locator('#currentRobot1');
-    if (await currentRobot1.isVisible()) {
-      await expect(currentRobot1).toContainText(robotName, { timeout: 5000 });
-    }
+    await expect(currentRobot1).toContainText(robotName, { timeout: 10000 });
     
     // Take screenshot of selection state
     await page.screenshot({ path: 'test-results/robot-selection.png', fullPage: true });

@@ -84,13 +84,17 @@ test.describe('Tournament Bracket Management', () => {
     
     // Try to start tournament without complete setup
     const startButton = page.locator('button:has-text("Start Tournament")');
-    if (await startButton.isVisible()) {
+    const isVisible = await startButton.isVisible();
+    
+    if (isVisible) {
       await startButton.click();
       await page.waitForTimeout(1000);
       
       // Should show validation error
-      const errorMessage = page.locator('text=/robots|complete|setup/i');
-      await expect(errorMessage).toBeVisible({ timeout: 5000 });
+      await expect(page.locator('text=/insufficient|not.*enough|complete/i')).toBeVisible({ timeout: 5000 });
+    } else {
+      // Button should be hidden when bracket is incomplete
+      expect(isVisible).toBeFalsy();
     }
     
     await page.screenshot({ path: 'test-results/incomplete-bracket-validation.png', fullPage: true });

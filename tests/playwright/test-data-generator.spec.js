@@ -2,7 +2,10 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Test Data Generator Feature', () => {
   
-  test('clean startup has no default robots', async ({ page }) => {
+  test('clean startup has no default robots', async ({ page, request }) => {
+    // Reset data first to ensure clean state
+    await request.post('/api/reset');
+    
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     

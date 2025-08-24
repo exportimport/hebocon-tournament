@@ -74,7 +74,8 @@ test.describe('Hebocon Tournament Server', () => {
     const firstRobotButton = page.locator('.robot-button').first();
     await expect(firstRobotButton).toBeVisible({ timeout: 10000 });
     
-    const robotName = await firstRobotButton.textContent();
+    // Extract robot name without delete button symbol
+    const robotName = (await firstRobotButton.textContent()).replace(/\s*×\s*$/, '').trim();
     await firstRobotButton.click();
     
     // Wait for the robot to appear in current match display (robust timing)

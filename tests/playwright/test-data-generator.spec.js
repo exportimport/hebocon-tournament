@@ -167,7 +167,8 @@ test.describe('Test Data Generator Feature', () => {
     const firstRobot = page.locator('.robot-button').first();
     await expect(firstRobot).toBeVisible({ timeout: 10000 });
     
-    const robotName = await firstRobot.textContent();
+    // Extract robot name without delete button symbol
+    const robotName = (await firstRobot.textContent()).replace(/\s*×\s*$/, '').trim();
     await firstRobot.click();
     
     // Wait for the robot to appear in current match display (robust timing)

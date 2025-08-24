@@ -122,12 +122,13 @@ test.describe('Core Tournament Functionality', () => {
     });
     
     await page.locator('button:has-text("🎲 16 Test-Roboter generieren")').click();
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000); // Wait a bit longer for generation
     await page.reload();
     await page.waitForLoadState('networkidle');
     
     // Verify robots exist
     const robotButtons = page.locator('.robot-button');
+    await expect(robotButtons.first()).toBeVisible(); // Wait for at least one robot
     const initialCount = await robotButtons.count();
     expect(initialCount).toBeGreaterThan(0);
     

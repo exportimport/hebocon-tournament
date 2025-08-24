@@ -22,7 +22,7 @@ module.exports = defineConfig({
   ],
 
   webServer: {
-    command: 'python3 app.py',
+    command: './venv/bin/python app.py',
     url: 'http://localhost:5005',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,

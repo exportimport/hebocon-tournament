@@ -27,7 +27,7 @@ DEFAULT_DATA = {
     'bracket': {
         'tournament_id': None,
         'status': 'not_setup',
-        'current_round': 'round1',
+        'current_round': 'Achtelfinale',
         'current_match_id': None,
         'matches': {},
         'bracket_positions': {}
@@ -74,7 +74,7 @@ def create_empty_bracket():
     bracket = {
         'tournament_id': str(uuid.uuid4()),
         'status': 'setup',
-        'current_round': 'round1',
+        'current_round': 'Achtelfinale',
         'current_match_id': None,
         'matches': {},
         'bracket_positions': {}
@@ -87,21 +87,21 @@ def create_empty_bracket():
             'robot2': 'TBD',
             'winner': None,
             'completed': False,
-            'round': 'round1'
+            'round': 'Achtelfinale'
         }
     
     # Quarterfinals: 4 matches (8 → 4)
-    bracket['matches']['qf_m1'] = {'robot1': 'winner_r1_m1', 'robot2': 'winner_r1_m2', 'winner': None, 'completed': False, 'round': 'quarterfinals'}
-    bracket['matches']['qf_m2'] = {'robot1': 'winner_r1_m3', 'robot2': 'winner_r1_m4', 'winner': None, 'completed': False, 'round': 'quarterfinals'}
-    bracket['matches']['qf_m3'] = {'robot1': 'winner_r1_m5', 'robot2': 'winner_r1_m6', 'winner': None, 'completed': False, 'round': 'quarterfinals'}
-    bracket['matches']['qf_m4'] = {'robot1': 'winner_r1_m7', 'robot2': 'winner_r1_m8', 'winner': None, 'completed': False, 'round': 'quarterfinals'}
+    bracket['matches']['qf_m1'] = {'robot1': 'winner_r1_m1', 'robot2': 'winner_r1_m2', 'winner': None, 'completed': False, 'round': 'Viertelfinale'}
+    bracket['matches']['qf_m2'] = {'robot1': 'winner_r1_m3', 'robot2': 'winner_r1_m4', 'winner': None, 'completed': False, 'round': 'Viertelfinale'}
+    bracket['matches']['qf_m3'] = {'robot1': 'winner_r1_m5', 'robot2': 'winner_r1_m6', 'winner': None, 'completed': False, 'round': 'Viertelfinale'}
+    bracket['matches']['qf_m4'] = {'robot1': 'winner_r1_m7', 'robot2': 'winner_r1_m8', 'winner': None, 'completed': False, 'round': 'Viertelfinale'}
     
     # Semifinals: 2 matches (4 → 2)
-    bracket['matches']['sf_m1'] = {'robot1': 'winner_qf_m1', 'robot2': 'winner_qf_m2', 'winner': None, 'completed': False, 'round': 'semifinals'}
-    bracket['matches']['sf_m2'] = {'robot1': 'winner_qf_m3', 'robot2': 'winner_qf_m4', 'winner': None, 'completed': False, 'round': 'semifinals'}
+    bracket['matches']['sf_m1'] = {'robot1': 'winner_qf_m1', 'robot2': 'winner_qf_m2', 'winner': None, 'completed': False, 'round': 'Halbfinale'}
+    bracket['matches']['sf_m2'] = {'robot1': 'winner_qf_m3', 'robot2': 'winner_qf_m4', 'winner': None, 'completed': False, 'round': 'Halbfinale'}
     
     # Finals: 1 match (2 → 1)
-    bracket['matches']['final'] = {'robot1': 'winner_sf_m1', 'robot2': 'winner_sf_m2', 'winner': None, 'completed': False, 'round': 'finals'}
+    bracket['matches']['final'] = {'robot1': 'winner_sf_m1', 'robot2': 'winner_sf_m2', 'winner': None, 'completed': False, 'round': 'Finale'}
     
     # Initialize bracket positions (1-16)
     for i in range(1, 17):
@@ -521,7 +521,7 @@ def _update_first_round_matches(bracket):
                 'robot2': 'TBD',
                 'winner': None,
                 'completed': False,
-                'round': 'round1'
+                'round': 'Achtelfinale'
             }
     
     # Update matches based on bracket positions
@@ -595,7 +595,7 @@ def reset_bracket():
     data['bracket'] = {
         'tournament_id': None,
         'status': 'not_setup',
-        'current_round': 'round1',
+        'current_round': 'Achtelfinale',
         'current_match_id': None,
         'matches': {},
         'bracket_positions': {}

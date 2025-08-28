@@ -665,9 +665,30 @@
                 const timer = await timerResponse.json();
                 
                 if (data && data.current_match) {
-                    // Roboternamen aktualisieren
-                    document.getElementById('robot1').textContent = data.current_match.robot1 || 'Roboter 1';
-                    document.getElementById('robot2').textContent = data.current_match.robot2 || 'Roboter 2';
+                    // Roboternamen mit Startnummern aktualisieren
+                    const robot1Name = data.current_match.robot1 || 'Roboter 1';
+                    const robot2Name = data.current_match.robot2 || 'Roboter 2';
+                    
+                    // Startnummern aus Bracket-Positionen ermitteln
+                    let robot1WithNumber = robot1Name;
+                    let robot2WithNumber = robot2Name;
+                    
+                    if (data.bracket && data.bracket.bracket_positions) {
+                        // Finde die Startnummern der Roboter
+                        for (let i = 1; i <= 16; i++) {
+                            const posKey = `pos_${i}`;
+                            const robotAtPos = data.bracket.bracket_positions[posKey];
+                            if (robotAtPos === robot1Name) {
+                                robot1WithNumber = `#${i} ${robot1Name}`;
+                            }
+                            if (robotAtPos === robot2Name) {
+                                robot2WithNumber = `#${i} ${robot2Name}`;
+                            }
+                        }
+                    }
+                    
+                    document.getElementById('robot1').textContent = robot1WithNumber;
+                    document.getElementById('robot2').textContent = robot2WithNumber;
                     document.getElementById('roundDisplay').textContent = data.current_match.round || 'Turnier';
                     
                     // Update Zeit merken
@@ -812,7 +833,18 @@
                 robot1Div.classList.add('pending');
                 robot1Div.textContent = match.robot1.includes('winner_') ? 'TBD' : match.robot1;
             } else {
-                robot1Div.textContent = match.robot1;
+                // Startnummer hinzufügen
+                let robot1WithNumber = match.robot1;
+                if (currentBracket.bracket_positions) {
+                    for (let i = 1; i <= 16; i++) {
+                        const posKey = `pos_${i}`;
+                        if (currentBracket.bracket_positions[posKey] === match.robot1) {
+                            robot1WithNumber = `#${i} ${match.robot1}`;
+                            break;
+                        }
+                    }
+                }
+                robot1Div.textContent = robot1WithNumber;
             }
             if (match.winner === match.robot1) {
                 robot1Div.classList.add('winner');
@@ -825,7 +857,18 @@
                 robot2Div.classList.add('pending');
                 robot2Div.textContent = match.robot2.includes('winner_') ? 'TBD' : match.robot2;
             } else {
-                robot2Div.textContent = match.robot2;
+                // Startnummer hinzufügen
+                let robot2WithNumber = match.robot2;
+                if (currentBracket.bracket_positions) {
+                    for (let i = 1; i <= 16; i++) {
+                        const posKey = `pos_${i}`;
+                        if (currentBracket.bracket_positions[posKey] === match.robot2) {
+                            robot2WithNumber = `#${i} ${match.robot2}`;
+                            break;
+                        }
+                    }
+                }
+                robot2Div.textContent = robot2WithNumber;
             }
             if (match.winner === match.robot2) {
                 robot2Div.classList.add('winner');
